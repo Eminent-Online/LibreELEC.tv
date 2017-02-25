@@ -1,0 +1,10 @@
+<sources>
+  <pictures>
+      <default pathversion="1"></default>
+      <source>
+          <name>Pictures</name>
+          <path pathversion="1">/storage/pictures/</path>
+          <allowsharing>true</allowsharing>
+      </source>
+  </pictures>
+</sources>

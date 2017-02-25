@@ -1,0 +1,21 @@
+diff --git a/src/resources/lib/modules/system.py b/src/resources/lib/modules/system.py
+index 66c4f7e..ff4bbd3 100644
+--- a/src/resources/lib/modules/system.py
++++ b/src/resources/lib/modules/system.py
+@@ -74,7 +74,7 @@ class system:
+                     'settings': {'hostname': {
+                         'order': 1,
+                         'name': 32190,
+-                        'value': '',
++                        'value': 'EM7680',
+                         'action': 'set_hostname',
+                         'type': 'text',
+                         'validate': '^([a-zA-Z0-9](?:[a-zA-Z0-9-\.]*[a-zA-Z0-9]))$',
+@@ -303,7 +303,7 @@ class system:
+             if not value is None:
+                 self.struct['ident']['settings']['hostname']['value'] = value
+             else:
+-                self.struct['ident']['settings']['hostname']['value'] = self.oe.DISTRIBUTION
++                self.struct['ident']['settings']['hostname']['value'] = self.oe.DEVCIE
+ 
+             # AutoUpdate

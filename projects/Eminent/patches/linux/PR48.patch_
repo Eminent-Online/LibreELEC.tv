@@ -1,0 +1,51 @@
+From f2a3faae352d3ac54e536c40cf0f749eb2669051 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sun, 14 Aug 2016 09:15:34 +0200
+Subject: [PATCH 1/2] Revert "arch/arm64/boot/dts/amlogic: Set Mali-450 minimum
+ clock, default clock and minimum PP cores to the maximum values to awlays
+ keep it running with max performance"
+
+This reverts commit 9c0ad9893449b88c147044d5cef724feda89a517.
+---
+ arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi b/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
+index 0d141ce..095823d 100644
+--- a/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
++++ b/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
+@@ -26,10 +26,8 @@
+ 		pmu_domain_config = <0x1 0x2 0x4 0x4 0x0 0x0 0x0 0x0 0x0 0x1 0x2 0x0>;
+ 		pmu_switch_delay = <0xffff> ;
+ 		num_of_pp = <3> ;
+-		def_clk = <4>;
+-		min_clk = <4>;
++		def_clk = <3>;
+ 		sc_mpp = <3>;/* number of pp used most of time.*/
+-		min_pp = <3>;
+ 		tbl = <&clk125_cfg &clk285_cfg &clk400_cfg &clk500_cfg &clk666_cfg &clk800_cfg>;
+ 
+ 		clocks = <&clock CLK_FPLL_DIV3>,
+
+From f7bff930601e907d9c27e313d4c2d7fb0a1ea6b6 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sat, 25 Feb 2017 10:29:19 +0100
+Subject: [PATCH 2/2] mesongxbb-gpu-mali450: enable 792MHz
+
+---
+ arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi b/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
+index 095823d..5bc8b24 100644
+--- a/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
++++ b/arch/arm64/boot/dts/amlogic/mesongxbb-gpu-mali450.dtsi
+@@ -28,7 +28,7 @@
+ 		num_of_pp = <3> ;
+ 		def_clk = <3>;
+ 		sc_mpp = <3>;/* number of pp used most of time.*/
+-		tbl = <&clk125_cfg &clk285_cfg &clk400_cfg &clk500_cfg &clk666_cfg &clk800_cfg>;
++		tbl = <&clk125_cfg &clk285_cfg &clk400_cfg &clk500_cfg &clk666_cfg &clk800_cfg &clk800_cfg>;
+ 
+ 		clocks = <&clock CLK_FPLL_DIV3>,
+ 			<&clock CLK_FPLL_DIV4>,

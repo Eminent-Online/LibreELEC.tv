@@ -1,0 +1,12 @@
+diff --git a/src/resources/lib/modules/connman.py b/src/resources/lib/modules/connman.py
+index 73ba3f8..2aea91b 100644
+--- a/src/resources/lib/modules/connman.py
++++ b/src/resources/lib/modules/connman.py
+@@ -1085,6 +1085,7 @@ class connman:
+             self.oe.set_busy(0)
+             self.menu_connections(None)
+             self.oe.dbg_log('connman::refresh_network', 'exit_function', 0)
++            os.system("/usr/bin/connmanctl scan wifi")
+         except Exception, e:
+             self.oe.set_busy(0)
+             self.oe.dbg_log('connman::refresh_network', 'ERROR: (' + repr(e) + ')', 4)
