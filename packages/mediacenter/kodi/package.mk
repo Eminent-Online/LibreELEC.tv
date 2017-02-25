@@ -389,6 +389,18 @@ post_makeinstall_target() {
       cp -R $PROJECT_DIR/$PROJECT/kodi/guisettings.xml $INSTALL/usr/share/kodi/config
     fi
 
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/network_wait $INSTALL/usr/share/kodi/config
+    fi
+
     if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml ]; then
       cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml $INSTALL/usr/share/kodi/config
     elif [ -f $PROJECT_DIR/$PROJECT/kodi/sources.xml ]; then
@@ -417,6 +429,19 @@ post_makeinstall_target() {
     mkdir -p $INSTALL/usr/share/kodi/media/Fonts
       cp $PKG_DIR/fonts/*.ttf $INSTALL/usr/share/kodi/media/Fonts
   fi
+
+  mkdir -p $INSTALL/usr/share/kodi/media
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/confluence.skin.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/confluence.skin.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/confluence.skin.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/confluence.skin.settings.xml $INSTALL/usr/share/kodi/config
+    fi
 
   debug_strip $INSTALL/usr/lib/kodi/kodi.bin
 }

@@ -33,6 +33,11 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_target() {
+
+  if [ -f $PROJECT_DIR/$PROJECT/kodi/kodi-logo.png ]; then
+   cp -f $PROJECT_DIR/$PROJECT/kodi/kodi-logo.png media/kodi-logo.png
+  fi
+
   TexturePacker -input media/ \
                 -output Textures.xbt \
                 -dupecheck \

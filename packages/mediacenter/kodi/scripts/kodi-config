@@ -17,10 +17,50 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+# kodi network wait
+if [ ! -f $HOME/.cache/libreelec/network_wait ] ; then
+    mkdir -p $HOME/.cache/libreelec
+    cp -f /usr/share/kodi/config/network_wait $HOME/.cache/libreelec/network_wait
+fi
+
+# restore addons
+if [ ! -f $HOME/.restore_addons ] ; then
+  if [ -f /usr/share/kodi/config/addons.tar ]; then
+    tar xf /usr/share/kodi/config/addons.tar -C /
+    touch $HOME/.restore_addons
+  fi
+fi
+
+# restore backup
+if [ ! -f $HOME/.restore_complete ] ; then
+  if [ -f /usr/share/kodi/config/backup.tar ]; then
+    mkdir -p $HOME/.restore
+    cp /usr/share/kodi/config/backup.tar $HOME/.restore/$(date +%Y%m%d%H%M%S).tar
+    touch $HOME/.restore_complete
+    sync
+    reboot
+  fi
+fi
 
 # hack: make addon-bins executable
 # done in kodi on addon install. but just in case..
 chmod +x /storage/.kodi/addons/*/bin/*
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/addon_data/skin.confluence/settings.xml ]; then
+  if [ -f /usr/share/kodi/config/confluence.skin.settings.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/addon_data/skin.confluence
+    cp /usr/share/kodi/config/confluence.skin.settings.xml $HOME/.kodi/userdata/addon_data/skin.confluence/settings.xml
+  fi
+fi
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml ]; then
+  if [ -f /usr/share/kodi/config/weather.yahoo.settings.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/addon_data/weather.yahoo
+    cp /usr/share/kodi/config/weather.yahoo.settings.xml $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml
+  fi
+fi
 
 # Nasty hack to work around OE to LE migration - Addons*.db needs to forget all about OE addons
 ADDONSDB=$(ls -1 /storage/.kodi/userdata/Database/Addons20.db 2>/dev/null)
@@ -54,6 +94,11 @@ fi
 
 # common setup guisettings
 if [ ! -f $HOME/.kodi/userdata/guisettings.xml ] ; then
+  # max res on first boot eclude smpte
+  maxRes=$(tail -n1 /sys/class/amhdmitx/amhdmitx0/disp_cap | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -v smpte);
+  if [ ! -z "$maxRes" ]; then
+    echo $maxRes > /sys/class/display/mode
+  fi
   if [ -f /usr/share/kodi/config/guisettings.xml ]; then
     cp /usr/share/kodi/config/guisettings.xml $HOME/.kodi/userdata
   fi
