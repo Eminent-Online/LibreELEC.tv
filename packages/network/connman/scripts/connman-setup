@@ -23,6 +23,11 @@
       cp /usr/share/connman/settings /storage/.cache/connman
   fi
 
+  if [ ! -f /storage/.cache/hostname ]; then
+    mkdir -p /storage/.cache
+      echo `cat /etc/device` > /storage/.cache/hostname
+  fi
+
 # set variable for connman main.conf location
   if [ -f /storage/.config/connman_main.conf ]; then
     export CONNMAN_MAIN="--config=/storage/.config/connman_main.conf"
