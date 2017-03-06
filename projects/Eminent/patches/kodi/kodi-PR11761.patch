@@ -1,0 +1,37 @@
+From f28eac8e4dea319c99337fbeccf950f951ea947f Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sun, 26 Feb 2017 11:06:46 +0100
+Subject: [PATCH] PVR: never cache pvr directories
+
+---
+ xbmc/filesystem/PVRDirectory.h | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/xbmc/filesystem/PVRDirectory.h b/xbmc/filesystem/PVRDirectory.h
+index fa26fd5..b32b682 100644
+--- a/xbmc/filesystem/PVRDirectory.h
++++ b/xbmc/filesystem/PVRDirectory.h
+@@ -32,8 +32,10 @@ class CPVRDirectory
+   CPVRDirectory();
+   virtual ~CPVRDirectory();
+ 
+-  virtual bool GetDirectory(const CURL& url, CFileItemList &items);
+-  virtual bool AllowAll() const { return true; }
++  virtual bool GetDirectory(const CURL& url, CFileItemList &items) override;
++  virtual bool AllowAll() const override { return true; }
++  virtual DIR_CACHE_TYPE GetCacheType(const CURL& url) const override { return DIR_CACHE_NEVER; };
++  virtual bool Exists(const CURL& url) override;
+ 
+   static bool SupportsWriteFileOperations(const std::string& strPath);
+   static bool IsLiveTV(const std::string& strPath);
+@@ -41,10 +43,6 @@ class CPVRDirectory
+   static bool HasDeletedTVRecordings();
+   static bool HasRadioRecordings();
+   static bool HasDeletedRadioRecordings();
+-
+-  virtual bool Exists(const CURL& url);
+-
+-private:
+ };
+ 
+ }

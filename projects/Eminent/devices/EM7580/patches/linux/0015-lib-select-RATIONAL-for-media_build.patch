@@ -1,0 +1,25 @@
+From 3e6ab072183944e76740396aeb2356b3383c4e82 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Wed, 28 Dec 2016 21:46:07 +0100
+Subject: [PATCH 15/26] lib: select RATIONAL for media_build
+
+---
+ lib/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Kconfig b/lib/Kconfig
+index fe01d41..50ca92c 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -14,7 +14,7 @@ config BITREVERSE
+ 	tristate
+ 
+ config RATIONAL
+-	boolean
++	def_bool y
+ 
+ config GENERIC_STRNCPY_FROM_USER
+ 	bool
+-- 
+1.9.1
+

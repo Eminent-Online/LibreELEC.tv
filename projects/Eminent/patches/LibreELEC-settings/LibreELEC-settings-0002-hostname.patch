@@ -1,0 +1,25 @@
+From 036e08395462a308eb44e50a4b3f8b22a427cc21 Mon Sep 17 00:00:00 2001
+From: alex <surkov.alex@gmail.com>
+Date: Sun, 26 Feb 2017 06:00:38 -0500
+Subject: [PATCH 2/6] hostname
+
+---
+ src/resources/lib/modules/system.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/resources/lib/modules/system.py b/src/resources/lib/modules/system.py
+index 6daa263..ae95dbb 100644
+--- a/src/resources/lib/modules/system.py
++++ b/src/resources/lib/modules/system.py
+@@ -384,7 +384,7 @@ class system:
+             if not value is None:
+                 self.struct['ident']['settings']['hostname']['value'] = value
+             else:
+-                self.struct['ident']['settings']['hostname']['value'] = self.oe.DISTRIBUTION
++                self.struct['ident']['settings']['hostname']['value'] = self.oe.DEVICE
+ 
+             # AutoUpdate
+ 
+-- 
+1.9.1
+

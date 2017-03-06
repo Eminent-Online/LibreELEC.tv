@@ -1,0 +1,76 @@
+From 7d54f70ca5c96b0ce02cc0e5e1a00ca6ef1d3d46 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Tue, 24 May 2016 10:35:54 +0200
+Subject: [PATCH 18/26] arch/arm/mach-meson*: cec-o-matic friendly CEC message
+ logging
+
+---
+ arch/arm/mach-meson6/hdmi_tx_hw/hdmi_tx_cec_hw.c | 6 +++---
+ arch/arm/mach-meson8/hdmi_tx_hw/hdmi_tx_cec_hw.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/mach-meson6/hdmi_tx_hw/hdmi_tx_cec_hw.c b/arch/arm/mach-meson6/hdmi_tx_hw/hdmi_tx_cec_hw.c
+index a5a554f..0b05656 100755
+--- a/arch/arm/mach-meson6/hdmi_tx_hw/hdmi_tx_cec_hw.c
++++ b/arch/arm/mach-meson6/hdmi_tx_hw/hdmi_tx_cec_hw.c
+@@ -136,7 +136,7 @@ int cec_ll_rx( unsigned char *msg, unsigned char *len)
+         pos += sprintf(msg_log_buf + pos, "CEC: rx msg len: %d   dat: ", rx_msg_length);
+         for (n = 0; n < rx_msg_length; n++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg_start[n]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg_start[n]);
+         }
+         pos += sprintf(msg_log_buf + pos, "\n");
+         msg_log_buf[pos] = '\0';
+@@ -177,7 +177,7 @@ int cec_ll_tx_polling(const unsigned char *msg, unsigned char len)
+         pos += sprintf(msg_log_buf + pos, "CEC: tx msg len: %d   dat: ", len);
+         for (n = 0; n < len; n++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg[n]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg[n]);
+         }
+         pos += sprintf(msg_log_buf + pos, "\nCEC: tx state: %d\n", ret);
+         msg_log_buf[pos] = '\0';
+@@ -290,7 +290,7 @@ static int cec_ll_tx_once(const unsigned char *msg, unsigned char len)
+         pos += sprintf(msg_log_buf + pos, "CEC: tx msg len: %d   dat: ", len);
+         for (n = 0; n < len; n++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg[n]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg[n]);
+         }
+         pos += sprintf(msg_log_buf + pos, "\nCEC: tx state: %d\n", ret);
+         msg_log_buf[pos] = '\0';
+diff --git a/arch/arm/mach-meson8/hdmi_tx_hw/hdmi_tx_cec_hw.c b/arch/arm/mach-meson8/hdmi_tx_hw/hdmi_tx_cec_hw.c
+index db9324a..07c09c2 100755
+--- a/arch/arm/mach-meson8/hdmi_tx_hw/hdmi_tx_cec_hw.c
++++ b/arch/arm/mach-meson8/hdmi_tx_hw/hdmi_tx_cec_hw.c
+@@ -116,7 +116,7 @@ int cec_ll_rx( unsigned char *msg, unsigned char *len)
+                        cec_global_info.my_node_index, *len);
+         for (i = 0; i < (*len); i++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg[i]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg[i]);
+         }
+         pos += sprintf(msg_log_buf + pos, "\n");
+         msg_log_buf[pos] = '\0';
+@@ -179,7 +179,7 @@ static int cec_ll_tx_once(const unsigned char *msg, unsigned char len)
+         pos += sprintf(msg_log_buf + pos, "CEC: tx msg len: %d   dat: ", len);
+         for (n = 0; n < len; n++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg[n]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg[n]);
+         }
+         pos += sprintf(msg_log_buf + pos, "\n");
+ 
+@@ -266,7 +266,7 @@ int cec_ll_tx_polling(const unsigned char *msg, unsigned char len)
+         pos += sprintf(msg_log_buf + pos, "CEC: tx msg len: %d   dat: ", len);
+         for (n = 0; n < len; n++)
+         {
+-            pos += sprintf(msg_log_buf + pos, "%02x ", msg[n]);
++            pos += sprintf(msg_log_buf + pos, "%02x:", msg[n]);
+         }
+         msg_log_buf[pos] = '\0';
+         printk("%s\n", msg_log_buf);
+-- 
+1.9.1
+

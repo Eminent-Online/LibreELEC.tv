@@ -1,0 +1,82 @@
+diff --git a/xbmc/guilib/GUIFontCache.h b/xbmc/guilib/GUIFontCache.h
+index 0490eef..1c56d7d 100644
+--- a/xbmc/guilib/GUIFontCache.h
++++ b/xbmc/guilib/GUIFontCache.h
+@@ -37,7 +37,7 @@
+ #include <cassert>
+ 
+ #include "TransformMatrix.h"
+-#include "system.h"
++#include "system_gl.h"
+ 
+ #define FONT_CACHE_TIME_LIMIT (1000)
+ #define FONT_CACHE_DIST_LIMIT (0.01f)
+@@ -146,7 +146,7 @@ class CGUIFontCache
+   CGUIFontCache(CGUIFontTTFBase &font);
+ 
+   ~CGUIFontCache();
+- 
++
+   Value &Lookup(Position &pos,
+                 const vecColors &colors, const vecText &text,
+                 uint32_t alignment, float maxPixelWidth,
+@@ -206,13 +206,13 @@ struct CGUIFontCacheDynamicPosition
+ struct CVertexBuffer
+ {
+ #if defined(HAS_GL) || defined(HAS_GLES)
+-  typedef unsigned int BufferHandleType;
++  typedef GLuint BufferHandleType;
+ #define  BUFFER_HANDLE_INIT 0
+ #elif defined(HAS_DX)
+   typedef void* BufferHandleType;
+ #define BUFFER_HANDLE_INIT nullptr
+ #endif
+-  BufferHandleType bufferHandle; // this is really a GLuint
++  BufferHandleType bufferHandle;
+   size_t size;
+   CVertexBuffer() : bufferHandle(BUFFER_HANDLE_INIT), size(0), m_font(NULL) {}
+   CVertexBuffer(BufferHandleType bufferHandle, size_t size, const CGUIFontTTFBase *font) : bufferHandle(bufferHandle), size(size), m_font(font) {}
+@@ -221,14 +221,14 @@ struct CVertexBuffer
+     /* In practice, the copy constructor is only called before a vertex buffer
+      * has been attached. If this should ever change, we'll need another support
+      * function in GUIFontTTFGL/DX to duplicate a buffer, given its handle. */
+-    assert(other.bufferHandle == 0);
++    assert(other.bufferHandle == BUFFER_HANDLE_INIT);
+   }
+   CVertexBuffer &operator=(CVertexBuffer &other)
+   {
+     /* This is used with move-assignment semantics for initialising the object in the font cache */
+-    assert(bufferHandle == 0);
++    assert(bufferHandle == BUFFER_HANDLE_INIT);
+     bufferHandle = other.bufferHandle;
+-    other.bufferHandle = 0;
++    other.bufferHandle = BUFFER_HANDLE_INIT;
+     size = other.size;
+     m_font = other.m_font;
+     return *this;
+diff --git a/xbmc/guilib/GUIFontTTFDX.cpp b/xbmc/guilib/GUIFontTTFDX.cpp
+index f87abf7..3ffffa5 100644
+--- a/xbmc/guilib/GUIFontTTFDX.cpp
++++ b/xbmc/guilib/GUIFontTTFDX.cpp
+@@ -206,7 +206,7 @@ void CGUIFontTTFDX::DestroyVertexBuffer(CVertexBuffer &buffer) const
+     CD3DBuffer* vbuffer = reinterpret_cast<CD3DBuffer*>(buffer.bufferHandle);
+     ClearReference((CGUIFontTTFDX*)this, vbuffer);
+     SAFE_DELETE(vbuffer);
+-    buffer.bufferHandle = 0;
++    buffer.bufferHandle = nullptr;
+   }
+ }
+ 
+diff --git a/xbmc/guilib/GUIFontTTFGL.cpp b/xbmc/guilib/GUIFontTTFGL.cpp
+index 60296c2..233a566 100644
+--- a/xbmc/guilib/GUIFontTTFGL.cpp
++++ b/xbmc/guilib/GUIFontTTFGL.cpp
+@@ -294,7 +294,7 @@ void CGUIFontTTFGL::DestroyVertexBuffer(CVertexBuffer &buffer) const
+   if (buffer.bufferHandle != 0)
+   {
+     // Release the buffer name for reuse
+-    glDeleteBuffers(1, (GLuint *) &buffer.bufferHandle);
++    glDeleteBuffers(1, &buffer.bufferHandle);
+     buffer.bufferHandle = 0;
+   }
+ }
