@@ -101,6 +101,7 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/share/connman/
     cp $PKG_DIR/config/settings $INSTALL/usr/share/connman/
+    cp $PKG_DIR/config/timezone $INSTALL/usr/share/connman/
 }
 
 post_install() {
