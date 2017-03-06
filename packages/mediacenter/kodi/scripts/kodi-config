@@ -17,6 +17,39 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+ADDONSDB=$(ls -1 /storage/.kodi/userdata/Database/Addons20.db 2>/dev/null)
+if [ -z "${ADDONSDB}" ]; then
+    if [ -f /usr/share/kodi/config/Addons27.db ]; then
+        mkdir -p /storage/.kodi/userdata/Database
+        cp -f /usr/share/kodi/config/Addons27.db /storage/.kodi/userdata/Database
+    fi
+fi
+
+# kodi network wait
+if [ ! -f $HOME/.cache/libreelec/network_wait ] ; then
+    mkdir -p $HOME/.cache/libreelec
+    cp -f /usr/share/kodi/config/network_wait $HOME/.cache/libreelec/network_wait
+fi
+
+# restore addons
+if [ ! -f $HOME/.restore_addons_`cat /etc/release` ] ; then
+  if [ -f /usr/share/kodi/config/addons.tar ]; then
+    tar xf /usr/share/kodi/config/addons.tar -C /
+    rm -f $HOME/.restore_addon*
+    touch $HOME/.restore_addons_`cat /etc/release`
+  fi
+fi
+
+# restore backup
+if [ ! -f $HOME/.restore_complete ] ; then
+  if [ -f /usr/share/kodi/config/backup.tar ]; then
+    mkdir -p $HOME/.restore
+    cp /usr/share/kodi/config/backup.tar $HOME/.restore/$(date +%Y%m%d%H%M%S).tar
+    touch $HOME/.restore_complete
+    sync
+    reboot
+  fi
+fi
 
 # hack: make addon-bins executable
 # done in kodi on addon install. but just in case..
@@ -26,6 +59,24 @@ chmod +x /storage/.kodi/addons/*/bin/*
 if [ -f /storage/.kodi/userdata/RssFeeds.xml ]; then
   sed -e "s,http://libreelec.tv/news?format=feed&type=rss,http://feeds.libreelec.tv/news,g" \
       -i /storage/.kodi/userdata/RssFeeds.xml
+fi
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/addon_data/skin.estuary/settings.xml ]; then
+    cp -f /usr/share/kodi/config/guisettings.xml $HOME/.kodi/userdata
+  if [ -f /usr/share/kodi/config/skin.estuary.settings.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/addon_data/skin.estuary
+    cp /usr/share/kodi/config/skin.estuary.settings.xml $HOME/.kodi/userdata/addon_data/skin.estuary/settings.xml
+  fi
+fi
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml ]; then
+  if [ -f /usr/share/kodi/config/weather.yahoo.settings.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/addon_data/weather.yahoo
+    cp /usr/share/kodi/config/weather.yahoo.settings.xml $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml
+    cp /usr/share/kodi/config/Location727232.dat $HOME/.kodi/userdata/addon_data/weather.yahoo/Location727232.dat
+  fi
 fi
 
 # setup Kodi sources
@@ -39,6 +90,23 @@ fi
 if [ ! -f $HOME/.kodi/userdata/guisettings.xml ] ; then
   if [ -f /usr/share/kodi/config/guisettings.xml ]; then
     cp /usr/share/kodi/config/guisettings.xml $HOME/.kodi/userdata
+  fi
+fi
+
+# Nasty hack to work around OE to LE migration - Addons*.db needs to forget all about OE addons
+ADDONSDB=$(ls -1 /storage/.kodi/userdata/Database/Addons20.db 2>/dev/null)
+if [ -n "${ADDONSDB}" ]; then
+  OEREPO="'repository.openelec.tv'"
+
+  if [ -n "$(sqlite3 $ADDONSDB "SELECT id FROM repo WHERE addonID IN (${OEREPO})")" ]; then
+
+    [ -f ${ADDONSDB}.OE2LE_Backup ] || cp ${ADDONSDB} ${ADDONSDB}.OE2LE_Backup
+
+    sqlite3 $ADDONSDB "DELETE FROM addon WHERE id IN (SELECT idAddon FROM addonlinkrepo a JOIN repo b ON (a.idRepo = b.id) WHERE b.addonID in (${OEREPO}))"
+    sqlite3 $ADDONSDB "DELETE FROM addonextra WHERE id IN (SELECT idAddon FROM addonlinkrepo a JOIN repo b ON (a.idRepo = b.id) WHERE b.addonID in (${OEREPO}))"
+    sqlite3 $ADDONSDB "DELETE FROM dependencies WHERE id IN (SELECT idAddon FROM addonlinkrepo a JOIN repo b ON (a.idRepo = b.id) WHERE b.addonID in (${OEREPO}))"
+    sqlite3 $ADDONSDB "DELETE FROM addonlinkrepo WHERE idRepo in (SELECT id FROM repo WHERE addonID IN (${OEREPO}))"
+    sqlite3 $ADDONSDB "DELETE FROM repo WHERE addonID IN (${OEREPO})"
   fi
 fi
 
