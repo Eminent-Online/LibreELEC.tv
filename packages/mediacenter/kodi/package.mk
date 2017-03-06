@@ -301,6 +301,19 @@ post_makeinstall_target() {
     elif [ -f $PROJECT_DIR/$PROJECT/kodi/guisettings.xml ]; then
       cp -R $PROJECT_DIR/$PROJECT/kodi/guisettings.xml $INSTALL/usr/share/kodi/config
     fi
+    $SED "s|@DISTRONAME@|$DEVICE|g" -i $INSTALL/usr/share/kodi/config/guisettings.xml
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/network_wait $INSTALL/usr/share/kodi/config
+    fi
 
     if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml ]; then
       cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml $INSTALL/usr/share/kodi/config
@@ -324,6 +337,19 @@ post_makeinstall_target() {
       cp $PROJECT_DIR/$PROJECT/kodi/appliance.xml $INSTALL/usr/share/kodi/system/settings
     else
       cp $PKG_DIR/config/appliance.xml $INSTALL/usr/share/kodi/system/settings
+    fi
+
+  mkdir -p $INSTALL/usr/share/kodi/media
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/skin.estuary.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/skin.estuary.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/skin.estuary.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/skin.estuary.settings.xml $INSTALL/usr/share/kodi/config
     fi
 
   # update addon manifest
