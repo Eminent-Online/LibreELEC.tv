@@ -1,6 +1,8 @@
 [Unit]
 Description=Samba SMB Daemon
 After=network.target
+ConditionKernelCommandLine=|samba
+ConditionPathExists=|/storage/.cache/services/samba.conf
 
 [Service]
 Type=forking
