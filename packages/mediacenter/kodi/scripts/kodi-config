@@ -17,14 +17,6 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-ADDONSDB=$(ls -1 /storage/.kodi/userdata/Database/Addons20.db 2>/dev/null)
-if [ -z "${ADDONSDB}" ]; then
-    if [ -f /usr/share/kodi/config/Addons27.db ]; then
-        mkdir -p /storage/.kodi/userdata/Database
-        cp -f /usr/share/kodi/config/Addons27.db /storage/.kodi/userdata/Database
-    fi
-fi
-
 # kodi network wait
 if [ ! -f $HOME/.cache/libreelec/network_wait ] ; then
     mkdir -p $HOME/.cache/libreelec
