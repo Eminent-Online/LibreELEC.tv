@@ -53,6 +53,8 @@
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
     KERNEL_PATCH_DIRS="amlogic-3.14"
 
+    SKINS="$SKINS Confluence"
+
 ################################################################################
 # setup build defaults
 ################################################################################
