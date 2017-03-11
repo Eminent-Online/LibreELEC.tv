@@ -23,19 +23,19 @@
         <channels default="true">1</channels>
         <config default="true">2</config>
         <dspaddonsenabled default="true">false</dspaddonsenabled>
-        <dtshdpassthrough>true</dtshdpassthrough>
+        <dtshdpassthrough default="true">false</dtshdpassthrough>
         <dtspassthrough>true</dtspassthrough>
-        <eac3passthrough>true</eac3passthrough>
+        <eac3passthrough default="true">false</eac3passthrough>
         <guisoundmode>0</guisoundmode>
         <maintainoriginalvolume default="true">true</maintainoriginalvolume>
-        <passthrough>true</passthrough>
+        <passthrough default="true">false</passthrough>
         <passthroughdevice default="true">ALSA:hdmi:CARD=AMLM8AUDIO,DEV=0</passthroughdevice>
         <processquality default="true">30</processquality>
         <samplerate default="true">48000</samplerate>
         <stereoupmix default="true">false</stereoupmix>
         <streamnoise default="true">true</streamnoise>
         <streamsilence default="true">1</streamsilence>
-        <truehdpassthrough>true</truehdpassthrough>
+        <truehdpassthrough default="true">false</truehdpassthrough>
         <volumesteps default="true">20</volumesteps>
     </audiooutput>
     <bluray>
@@ -353,7 +353,7 @@
         <updateonstartup default="true">false</updateonstartup>
     </videolibrary>
     <videoplayer>
-        <adjustrefreshrate default="true">2</adjustrefreshrate>
+        <adjustrefreshrate>1</adjustrefreshrate>
         <autoplaynextitem default="true">false</autoplaynextitem>
         <errorinaspect default="true">0</errorinaspect>
         <hqscalers default="true">20</hqscalers>
@@ -638,3 +638,4 @@
         <fvolumelevel>1.000000</fvolumelevel>
     </audio>
 </settings>
+
