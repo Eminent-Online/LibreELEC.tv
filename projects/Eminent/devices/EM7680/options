@@ -1,0 +1,13 @@
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxl_p212_1g.dtb gxl_p212_2g.dtb"
+
+  # Additional options to be passed to Android mkbootimg
+    ANDROID_BOOTIMG_OPTIONS="--base 0x0 --kernel_offset 0x1080000"
+
+  # Kernel to use. values can be:
+  # default:  default mainline kernel
+    LINUX="custom"
+    KERNEL_VERSION="f353216"
+    KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
+    KERNEL_PATCH_DIRS="amlogic-3.14"
