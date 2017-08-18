@@ -1,0 +1,51 @@
+From a4ee867f770c99ffe3cfbd2b3d2f8f33bce3f288 Mon Sep 17 00:00:00 2001
+From: alex <surkov.alex@gmail.com>
+Date: Mon, 27 Feb 2017 14:45:25 -0500
+Subject: [PATCH 05/26] disable cpu debug
+
+---
+ arch/arm/mach-meson8b/clock.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/mach-meson8b/clock.c b/arch/arm/mach-meson8b/clock.c
+index b409f30..6b66f05 100755
+--- a/arch/arm/mach-meson8b/clock.c
++++ b/arch/arm/mach-meson8b/clock.c
+@@ -820,8 +820,8 @@ static int _clk_set_rate_cpu(struct clk *clk, unsigned long cpu, unsigned long g
+ 		aml_set_reg32_bits(P_HHI_SYS_CPU_CLK_CNTL, 2, 0, 2);    // select to mpll
+ 			aml_set_reg32_bits(P_HHI_SYS_CPU_CLK_CNTL, 0, 2, 2);    // cancel external od
+ 		    udelay_scaled(500, oldcpu / 1000000, 24 /*clk_get_rate_xtal*/);
+-	        printk(KERN_DEBUG"CTS_CPU_CLK %4ld --> %4ld (MHz)\n",
+-									clk->rate / 1000000, cpu / 1000000);
++	        //printk(KERN_DEBUG"CTS_CPU_CLK %4ld --> %4ld (MHz)\n",
++		//							clk->rate / 1000000, cpu / 1000000);
+             clk->parent->rate = cpu;
+         } else {
+ 		set_sys_pll(clk->parent, cpu);
+@@ -856,7 +856,7 @@ static int _clk_set_rate_cpu(struct clk *clk, unsigned long cpu, unsigned long g
+ 	clk->rate = cpu;
+ 
+ #ifdef CONFIG_CPU_FREQ_DEBUG
+-	pr_debug("(CTS_CPU_CLK) CPU %ld.%ldMHz\n", clk_get_rate_a9(clk) / 1000000, clk_get_rate_a9(clk)%1000000);
++	//pr_debug("(CTS_CPU_CLK) CPU %ld.%ldMHz\n", clk_get_rate_a9(clk) / 1000000, clk_get_rate_a9(clk)%1000000);
+ #endif /* CONFIG_CPU_FREQ_DEBUG */
+ 
+ 	return 0;
+@@ -1198,10 +1198,10 @@ static int set_sys_pll(struct clk *clk,  unsigned long dst)
+ 	cpu_clk_cntl = sys_pll_settings[idx][1];
+ 	latency.d32 =  sys_pll_settings[idx][2];
+ 
+-	printk(KERN_DEBUG"CTS_CPU_CLK %4ld --> %4ld (MHz)\n",
+-									clk->rate / 1000000, dst / 1000000);
+-	pr_debug("CTS_CPU_CLK old_cntl=0x%x new_cntl=0x%x, latency: %x\n",
+-									curr_cntl, cpu_clk_cntl, latency.d32);
++	//printk(KERN_DEBUG"CTS_CPU_CLK %4ld --> %4ld (MHz)\n",
++	//								clk->rate / 1000000, dst / 1000000);
++	//pr_debug("CTS_CPU_CLK old_cntl=0x%x new_cntl=0x%x, latency: %x\n",
++	//								curr_cntl, cpu_clk_cntl, latency.d32);
+ 
+ 	if (cpu_clk_cntl != curr_cntl) {
+ SETPLL:
+-- 
+1.9.1
+

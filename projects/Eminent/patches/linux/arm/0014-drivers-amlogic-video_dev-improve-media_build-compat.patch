@@ -1,0 +1,26 @@
+From 594ba3851a69f3c6b07f9a566a0e87ef74849845 Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Mon, 19 Dec 2016 00:18:36 +0100
+Subject: [PATCH 14/26] drivers/amlogic/video_dev: improve media_build
+ compatibility again
+
+---
+ drivers/amlogic/video_dev/amlvideo.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/amlogic/video_dev/amlvideo.c b/drivers/amlogic/video_dev/amlvideo.c
+index 404ced2d..47d0015 100755
+--- a/drivers/amlogic/video_dev/amlvideo.c
++++ b/drivers/amlogic/video_dev/amlvideo.c
+@@ -1043,6 +1043,8 @@ static int __init amlvideo_create_instance(int inst) {
+ 
+     *vfd = amlvideo_template;
+     // vfd->debug = debug;
++    vfd->v4l2_dev = &dev->v4l2_dev;
++
+     ret = video_register_device(vfd, VFL_TYPE_GRABBER, video_nr);
+     if (ret < 0)
+         goto rel_vdev;
+-- 
+1.9.1
+
