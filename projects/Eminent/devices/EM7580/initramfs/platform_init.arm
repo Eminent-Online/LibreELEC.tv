@@ -29,12 +29,6 @@ for arg in $(cat /proc/cmdline); do
     hdmimode=*)
       hdmimode="${arg#*=}"
       ;;
-    bootfromsd*)
-      bootfromsd=1
-      ;;
-    bootfromusb*)
-      bootfromusb=1
-      ;;
   esac
 done
 

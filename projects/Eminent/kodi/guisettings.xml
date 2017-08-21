@@ -19,7 +19,8 @@
         <ac3passthrough default="true">true</ac3passthrough>
         <ac3transcode default="true">false</ac3transcode>
         <atempothreshold default="true">2</atempothreshold>
-        <audiodevice>ALSA:hdmi:CARD=AMLM8AUDIO,DEV=0</audiodevice>
+        <audiodevice>ALSA:iec958:CARD=AMLM8AUDIO,DEV=0</audiodevice>
+        <boostcenter default="true">0</boostcenter>
         <channels default="true">1</channels>
         <config default="true">2</config>
         <dspaddonsenabled default="true">false</dspaddonsenabled>
@@ -29,11 +30,11 @@
         <guisoundmode>0</guisoundmode>
         <maintainoriginalvolume default="true">true</maintainoriginalvolume>
         <passthrough default="true">false</passthrough>
-        <passthroughdevice default="true">ALSA:hdmi:CARD=AMLM8AUDIO,DEV=0</passthroughdevice>
+        <passthroughdevice default="true">ALSA:iec958:CARD=AMLM8AUDIO,DEV=0</passthroughdevice>
         <processquality default="true">30</processquality>
         <samplerate default="true">48000</samplerate>
         <stereoupmix default="true">false</stereoupmix>
-        <streamnoise default="true">true</streamnoise>
+        <streamnoise default="true">false</streamnoise>
         <streamsilence default="true">1</streamsilence>
         <truehdpassthrough default="true">false</truehdpassthrough>
         <volumesteps default="true">20</volumesteps>
@@ -105,7 +106,7 @@
             <level>0</level>
             <showhigherlevels>true</showhigherlevels>
         </eventlog>
-        <systemtotaluptime>269</systemtotaluptime>
+        <systemtotaluptime>272</systemtotaluptime>
     </general>
     <input>
         <asknewcontrollers default="true">true</asknewcontrollers>
@@ -133,7 +134,7 @@
         <enablerssfeeds default="true">false</enablerssfeeds>
         <font default="true">Default</font>
         <rssedit default="true"></rssedit>
-        <skin default="true">skin.estuary</skin>
+        <skin>skin.confluence</skin>
         <skincolors default="true">SKINDEFAULT</skincolors>
         <skintheme default="true">SKINDEFAULT</skintheme>
         <skinzoom default="true">0</skinzoom>
@@ -287,7 +288,7 @@
         <airplaypassword default="true"></airplaypassword>
         <airplayvideosupport default="true">true</airplayvideosupport>
         <airplayvolumecontrol default="true">true</airplayvolumecontrol>
-        <devicename>@DISTRONAME@</devicename>
+        <devicename>EM7580</devicename>
         <esallinterfaces>true</esallinterfaces>
         <escontinuousdelay default="true">25</escontinuousdelay>
         <esenabled default="true">true</esenabled>
@@ -315,6 +316,7 @@
         <staytime default="true">5</staytime>
     </slideshow>
     <smb>
+        <maxprotocol>1</maxprotocol>
         <winsserver default="true">0.0.0.0</winsserver>
         <workgroup default="true">WORKGROUP</workgroup>
     </smb>
@@ -369,7 +371,7 @@
         <teletextscale default="true">true</teletextscale>
         <useamcodec default="true">true</useamcodec>
         <useamcodech264 default="true">0</useamcodech264>
-        <useamcodecmpeg2 default="true">0</useamcodecmpeg2>
+        <useamcodecmpeg2 default="true">800</useamcodecmpeg2>
         <useamcodecmpeg4 default="true">800</useamcodecmpeg4>
         <usedisplayasclock default="true">false</usedisplayasclock>
         <usedxva2 default="true">true</usedxva2>

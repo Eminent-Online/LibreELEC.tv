@@ -2,16 +2,17 @@
 # setup system defaults
 ################################################################################
 
-    TARGET_CPU="cortex-a53"
-
+  # The TARGET_CPU variable controls which processor should be targeted for
+  # generated code.
     case $TARGET_ARCH in
-      aarch64)
-        TARGET_CPU_FLAGS="+crc+fp+simd"
-        ;;
       arm)
-        TARGET_CPU_FLAGS="+crc"
-        TARGET_FPU="neon-fp-armv8"
+        TARGET_CPU="cortex-a9"
         TARGET_FLOAT="hard"
+        TARGET_FPU="neon-fp16"
+        ;;
+      aarch64)
+        TARGET_CPU="cortex-a53"
+        TARGET_CPU_FLAGS="+crc+fp+simd"
         ;;
     esac
 
@@ -30,8 +31,14 @@
   # Kernel target
     KERNEL_TARGET="Image.lzo"
 
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200_2G.dtb"
+
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
+
+  # Additional options to be passed to Android mkbootimg
+    ANDROID_BOOTIMG_OPTIONS="--base 0x0 --kernel_offset 0x1080000"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=""
@@ -41,9 +48,18 @@
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
-    LINUX="amlogic-3.10"
-
-    SKINS="$SKINS Confluence"
+    case $TARGET_ARCH in
+      aarch64)
+        LINUX="custom"
+        KERNEL_VERSION="6e79ad4"
+        KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
+        KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
+        KERNEL_PATCH_DIRS="amlogic-3.14"
+        ;;
+      arm)
+        LINUX="amlogic-3.10"
+        ;;
+      esac
 
 ################################################################################
 # setup build defaults
@@ -58,6 +74,9 @@
 ################################################################################
 # setup project defaults
 ################################################################################
+
+  # Skin
+    SKINS="$SKINS Confluence"
 
   # build and install ALSA Audio support (yes / no)
     ALSA_SUPPORT="yes"
@@ -95,12 +114,19 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU gpu-aml media_build RTL8812AU"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU gpu-aml media_build"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml-all"
+
+  if [ "$TARGET_ARCH" = arm ]; then
+    KERNEL_TARGET="uImage"
+    MESON_FAMILY="8"
+    INITRAMFS_MODULES="softcursor bitblit font fbcon"
+    ANDROID_BOOTIMG_OPTIONS=""
+  fi
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -110,6 +136,9 @@
 
   # Amlogic IR remote support (yes / no)
     AMREMOTE_SUPPORT="yes"
+
+  # build and install iSCSI support - iscsistart (yes / no)
+    ISCSI_SUPPORT="no"
 
   # build with swap support (yes / no)
     SWAP_SUPPORT="yes"
@@ -127,11 +156,13 @@
     EXTRA_DEPS="mkimage"
     EXTRA_DEPS_PKG="u-boot-tools"
 
-    # custom addon server url
+  # kernel image name
+    KERNEL_NAME="kernel.img"
+
+  # custom addon server url
     ADDON_SERVER_URL="https://raw.github.com/surkovalex/unofficial-addons/$ADDON_VERSION"
     ADDON_PATH="Amlogic/$TARGET_ARCH"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"
-
