@@ -17,18 +17,12 @@
 ################################################################################
 
 PKG_NAME="libcec"
-PKG_VERSION="0a97062"
+PKG_VERSION="f2c4ca7"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://libcec.pulse-eight.com/"
 PKG_URL="https://github.com/Pulse-Eight/libcec/archive/$PKG_VERSION.tar.gz"
-if [ "$PROJECT" = "imx6" ]; then
-  if [ "$LINUX_VERSION" = "sr-3.14" ]; then
-    PKG_PATCH_DIRS="3.14-sr"
-  else
-    PKG_PATCH_DIRS="4.4-xbian"
-  fi
-fi
+[ "$PROJECT" = "imx6" ] && PKG_PATCH_DIRS="${LINUX#imx6-}"
 PKG_DEPENDS_TARGET="toolchain systemd lockdev p8-platform"
 PKG_SECTION="system"
 PKG_SHORTDESC="libCEC is an open-source dual licensed library designed for communicating with the Pulse-Eight USB - CEC Adaptor"
@@ -52,7 +46,7 @@ else
 fi
 
 if [ "$KODIPLAYER_DRIVER" = "libamcodec" ]; then
-  if [ "$TARGET_KERNEL_ARCH" = "arm64" ]; then
+  if [ "$TARGET_ARCH" = "aarch64" ]; then
     PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AOCEC_API=1"
   else
     PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AMLOGIC_API=1"

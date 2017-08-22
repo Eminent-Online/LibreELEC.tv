@@ -67,19 +67,12 @@ if [ -n "$CUSTOM_GIT_HASH" ]; then
   GIT_HASH="$CUSTOM_GIT_HASH"
 fi
 
-if [ -z "$DEVICE" ]; then
-  TARGET_VERSION="$PROJECT.$TARGET_ARCH-$LIBREELEC_VERSION"
-else
-  TARGET_VERSION="$PROJECT.$TARGET_ARCH-$DEVICE-$LIBREELEC_VERSION"
-fi
+LIBREELEC_ARCH="$PROJECT.$TARGET_ARCH"
+TARGET_VERSION="$LIBREELEC_ARCH-$DEVICE-$LIBREELEC_VERSION"
 IMAGE_NAME="$DISTRONAME-$TARGET_VERSION"
 
 if [ "$DEVEL_VERSION" = "devel" ] ; then
-  if [ -z "$DEVICE" ]; then
-    IMAGE_NAME="$DISTRONAME-$PROJECT.$TARGET_ARCH-$OS_VERSION-$LIBREELEC_VERSION"
-  else
-    IMAGE_NAME="$DISTRONAME-$PROJECT.$TARGET_ARCH-$DEVICE-$OS_VERSION-$LIBREELEC_VERSION"
-  fi
+  IMAGE_NAME="$DISTRONAME-$LIBREELEC_ARCH-$OS_VERSION-$LIBREELEC_VERSION"
 fi
 
 if [ "$PROJECT" == "imx6" -a -n "$SYSTEM" ]; then
@@ -136,12 +129,12 @@ echo -e "VERSION=\"$LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "ID=\"libreelec\"" >> $INSTALL/etc/os-release
 echo -e "VERSION_ID=\"$OS_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "DEVICE=\"$DEVICE\"" >> $INSTALL/etc/os-release
-echo -e "PRETTY_NAME=\"$DISTRONAME ($LIBREELEC_BUILD) - Version: $LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
+echo -e "PRETTY_NAME=\"$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION\"" >> $INSTALL/etc/os-release
 echo -e "HOME_URL=\"https://libreelec.tv\"" >> $INSTALL/etc/os-release
 echo -e "BUG_REPORT_URL=\"$ORIGIN_URL\"" >> $INSTALL/etc/os-release
 echo -e "BUILD_ID=\"$GIT_HASH\"" >> $INSTALL/etc/os-release
-echo -e "OPENELEC_ARCH=\"$PROJECT.$TARGET_ARCH\"" >> $INSTALL/etc/os-release
-echo -e "LIBREELEC_ARCH=\"$PROJECT.$TARGET_ARCH\"" >> $INSTALL/etc/os-release
+echo -e "OPENELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
+echo -e "LIBREELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
 echo -e "LIBREELEC_BUILD=\"$LIBREELEC_BUILD\"" >> $INSTALL/etc/os-release
 
 # create /etc/issue
@@ -150,10 +143,7 @@ echo "$GREETING1" >> $INSTALL/etc/issue
 echo "$GREETING2" >> $INSTALL/etc/issue
 echo "$GREETING3" >> $INSTALL/etc/issue
 echo "$GREETING4" >> $INSTALL/etc/issue
-echo "$DISTRONAME ($LIBREELEC_BUILD) Version: $LIBREELEC_VERSION" >> $INSTALL/etc/issue
-if [ "$DEVEL_VERSION" = "devel" ] ; then
-  echo "$DISTRONAME git: $GIT_HASH" >> $INSTALL/etc/issue
-fi
+echo "$DISTRONAME ($LIBREELEC_BUILD): $LIBREELEC_VERSION ($LIBREELEC_ARCH)" >> $INSTALL/etc/issue
 
 ln -sf /etc/issue $INSTALL/etc/motd
 
@@ -191,7 +181,7 @@ $SCRIPTS/install network
 [ "$REMOTE_SUPPORT" = "yes" ] && $SCRIPTS/install remote
 
 # Virtual image creation support
-[ "$PROJECT" = Virtual ] && $SCRIPTS/install virtual
+[ "$PROJECT" = "Generic" ] && $SCRIPTS/install virtual
 
 # Installer support
 [ "$INSTALLER_SUPPORT" = "yes" ] && $SCRIPTS/install installer
@@ -229,15 +219,12 @@ fi
 
 # run depmod
 MODVER=$(basename $(ls -d $INSTALL/usr/lib/modules/*))
-find $INSTALL/usr/lib/modules/$MODVER/ -name "*.ko" | \
+find $INSTALL/usr/lib/modules/$MODVER/ -name *.ko | \
   sed -e "s,$INSTALL/usr/lib/modules/$MODVER/,," > $INSTALL/usr/lib/modules/$MODVER/modules.order
-$ROOT/$TOOLCHAIN/bin/depmod -b $INSTALL/usr -a -e -F "$BUILD/linux-$(kernel_version)/System.map" $MODVER
+$TOOLCHAIN/bin/depmod -b $INSTALL/usr -a -e -F "$BUILD/linux-$(kernel_version)/System.map" $MODVER
 
 # strip kernel modules
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  STRIP=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/aarch64-linux-gnu-strip
-fi
-for MOD in `find $INSTALL/usr/lib/modules/ -type f -name "*.ko"`; do
+for MOD in `find $INSTALL/usr/lib/modules/ -type f -name *.ko`; do
   $STRIP --strip-debug $MOD
 done
 
@@ -255,10 +242,10 @@ if [ -z "$SQUASHFS_COMPRESSION" ]; then
 fi
 
 echo "rm -rf \"$TARGET_IMG/$IMAGE_NAME.system\"" >> $FAKEROOT_SCRIPT
-echo "$ROOT/$TOOLCHAIN/bin/mksquashfs \"$BUILD/image/system\" \"$TARGET_IMG/$IMAGE_NAME.system\" -noappend -comp $SQUASHFS_COMPRESSION" >> $FAKEROOT_SCRIPT
+echo "$TOOLCHAIN/bin/mksquashfs \"$BUILD/image/system\" \"$TARGET_IMG/$IMAGE_NAME.system\" -noappend -comp $SQUASHFS_COMPRESSION" >> $FAKEROOT_SCRIPT
 
 # run fakeroot
-$ROOT/$TOOLCHAIN/bin/fakeroot -- $FAKEROOT_SCRIPT
+$TOOLCHAIN/bin/fakeroot -- $FAKEROOT_SCRIPT
 rm -rf $FAKEROOT_SCRIPT
 
 # set permissions
@@ -267,14 +254,6 @@ chmod 0644 $TARGET_IMG/$IMAGE_NAME.system
 if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]; then
 
   RELEASE_DIR="target/$IMAGE_NAME"
-
-  if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/install" ]; then
-    INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/devices/$DEVICE/install"
-  else
-    INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/install"
-  fi
-
-  MKIMAGE_TOOL_CMD="$(which mkimage) -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d"
 
   # cleanup
   rm -rf $RELEASE_DIR
@@ -340,7 +319,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   tar cf $TARGET_IMG/$IMAGE_NAME.tar -C target $IMAGE_NAME
 
   # create image files if requested
-  if [[ ( "$1" = "amlpkg" || "$1" = "noobs" || "$1" = "mkimage" ) && -n "$BOOTLOADER" ]]; then
+  if [[ ( "$1" = "noobs" || "$1" = "mkimage" ) && -n "$BOOTLOADER" ]]; then
     # projects can set KERNEL_NAME (kernel.img)
     if [ -z "$KERNEL_NAME" ] ; then
       KERNEL_NAME="KERNEL"
@@ -362,13 +341,12 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       TOOLCHAIN="$TOOLCHAIN" \
       PROJECT_DIR="$PROJECT_DIR" \
       PROJECT="$PROJECT" \
+      DEVICE="$DEVICE" \
       DISTRO="$DISTRO" \
       TARGET_IMG="$TARGET_IMG" \
       IMAGE_NAME="$IMAGE_NAME" \
-      INSTALL_SRC_DIR="$INSTALL_SRC_DIR" \
       BOOTLOADER="$BOOTLOADER" \
       KERNEL_NAME="$KERNEL_NAME" \
-      MKIMAGE_TOOL_CMD="$MKIMAGE_TOOL_CMD" \
       RELEASE_DIR=$RELEASE_DIR \
       UUID_SYSTEM="$(uuidgen)" \
       UUID_STORAGE="$(uuidgen)" \
@@ -386,6 +364,11 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
   if [ "$1" = "amlpkg" ]; then
     echo "Creating Amlogic ZIP update package"
 
+    if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/install" ]; then
+      INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/devices/$DEVICE/install"
+    else
+      INSTALL_SRC_DIR="$PROJECT_DIR/$PROJECT/install"
+    fi
     AML_PKG_DIR="$RELEASE_DIR/ampl-pkg"
 
     # create package directory
@@ -440,8 +423,8 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     fi
 
     # copy device tree image if any
-    if [ -f "$ROOT/$INSTALL/usr/share/bootloader/dtb.img" ]; then
-      cp "$ROOT/$INSTALL/usr/share/bootloader/dtb.img" .
+    if [ -f "$INSTALL/usr/share/bootloader/dtb.img" ]; then
+      cp "$INSTALL/usr/share/bootloader/dtb.img" .
     fi
 
     zip -q $TARGET_IMG/$IMAGE_NAME.zip *

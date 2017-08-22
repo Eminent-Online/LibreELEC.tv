@@ -17,14 +17,13 @@
 ################################################################################
 
 PKG_NAME="kodi-theme-Confluence"
-PKG_VERSION="17a11f6"
+PKG_VERSION="96bed03"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/skin.confluence"
 PKG_URL="$PKG_SITE/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi"
 PKG_SOURCE_DIR="skin.confluence-$PKG_VERSION*"
-#PKG_NEED_UNPACK="$ROOT/packages/mediacenter/$MEDIACENTER/package.mk"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi-theme-Confluence: Kodi Mediacenter theme"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center and XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
@@ -44,7 +43,6 @@ makeinstall_target() {
     cp -R */ $INSTALL/usr/share/kodi/addons/skin.confluence
     cp *.txt $INSTALL/usr/share/kodi/addons/skin.confluence
     cp *.xml $INSTALL/usr/share/kodi/addons/skin.confluence
-#    cp *.png $INSTALL/usr/share/kodi/addons/skin.confluence
     rm -rf $INSTALL/usr/share/kodi/addons/skin.confluence/media
 
   mkdir -p $INSTALL/usr/share/kodi/addons/skin.confluence/media

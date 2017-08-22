@@ -18,13 +18,13 @@
 
 PKG_NAME="ffmpeg"
 # Current branch is: release/3.1-xbmc
-PKG_VERSION="33c167d"
+PKG_VERSION="f58e5b9"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/xbmc/FFmpeg/archive/${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="FFmpeg-${PKG_VERSION}*"
-PKG_DEPENDS_TARGET="toolchain yasm:host zlib bzip2 libressl speex"
+PKG_DEPENDS_TARGET="toolchain yasm:host zlib bzip2 openssl speex"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
@@ -61,29 +61,22 @@ fi
 
 case "$TARGET_ARCH" in
   arm)
-    FFMPEG_TABLES="--enable-hardcoded-tables"
     CFLAGS="$CFLAGS -mthumb"
-    ;;
-  *)
-    FFMPEG_TABLES="--disable-hardcoded-tables"
     ;;
 esac
 
-case "$TARGET_FPU" in
-  neon*)
-    FFMPEG_FPU="--enable-neon"
-    ;;
-  *)
-    FFMPEG_FPU="--disable-neon"
-    ;;
-esac
+if echo "$TARGET_FPU" | grep -q '^neon' || [[ "$TARGET_ARCH" = "aarch64" ]]; then
+  FFMPEG_FPU="--enable-neon"
+else
+  FFMPEG_FPU="--disable-neon"
+fi
 
 if [ "$DISPLAYSERVER" = "x11" ]; then
   FFMPEG_X11GRAB="--enable-indev=x11grab_xcb"
 fi
 
 pre_configure_target() {
-  cd $ROOT/$PKG_BUILD
+  cd $PKG_BUILD
   rm -rf .$TARGET_NAME
 
 # ffmpeg fails building for x86_64 with LTO support
@@ -124,12 +117,12 @@ configure_target() {
               --enable-shared \
               --enable-gpl \
               --disable-version3 \
-              --disable-nonfree \
+              --enable-nonfree \
               --enable-logging \
               --disable-doc \
               $FFMPEG_DEBUG \
               --enable-pic \
-              --pkg-config="$ROOT/$TOOLCHAIN/bin/pkg-config" \
+              --pkg-config="$TOOLCHAIN/bin/pkg-config" \
               --enable-optimizations \
               --disable-extra-warnings \
               --disable-ffprobe \
@@ -159,7 +152,6 @@ configure_target() {
               $FFMPEG_VDPAU \
               --disable-dxva2 \
               --enable-runtime-cpudetect \
-              $FFMPEG_TABLES \
               --disable-memalign-hack \
               --disable-encoders \
               --enable-encoder=ac3 \

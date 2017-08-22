@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="7f7f7e8"
+PKG_VERSION="3aa19b0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -31,7 +31,11 @@ PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or X
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CMAKE_SCRIPT="$ROOT/$PKG_BUILD/project/cmake/CMakeLists.txt"
+if [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
+    PKG_PATCH_DIRS="amlogic"
+fi
+
+PKG_CMAKE_SCRIPT="$PKG_BUILD/project/cmake/CMakeLists.txt"
 
   get_graphicdrivers
 
@@ -168,6 +172,12 @@ else
   KODI_SSH="-DENABLE_SSH=OFF"
 fi
 
+if echo "$TARGET_FPU" | grep -q '^neon' || [[ "$TARGET_ARCH" = "aarch64" ]]; then
+  KODI_NEON="-DENABLE_NEON=ON"
+else
+  KODI_NEON="-DENABLE_NEON=OFF"
+fi
+
 if [ "$VDPAU_SUPPORT" = "yes" -a "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libvdpau"
   KODI_VDPAU="-DENABLE_VDPAU=ON"
@@ -205,9 +215,9 @@ KODI_LIBDVD="$KODI_DVDCSS \
              -DLIBDVDNAV_URL=$ROOT/$SOURCES/libdvdnav/libdvdnav-$(get_pkg_version libdvdnav).tar.gz \
              -DLIBDVDREAD_URL=$ROOT/$SOURCES/libdvdread/libdvdread-$(get_pkg_version libdvdread).tar.gz"
 
-PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$ROOT/$TOOLCHAIN \
-                       -DWITH_TEXTUREPACKER=$ROOT/$TOOLCHAIN/bin/TexturePacker \
-                       -DDEPENDS_PATH=$ROOT/$PKG_BUILD/depends \
+PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
+                       -DWITH_TEXTUREPACKER=$TOOLCHAIN/bin/TexturePacker \
+                       -DDEPENDS_PATH=$PKG_BUILD/depends \
                        -DPYTHON_INCLUDE_DIRS=$SYSROOT_PREFIX/usr/include/python2.7 \
                        -DGIT_VERSION=$PKG_VERSION \
                        -DENABLE_INTERNAL_FFMPEG=OFF \
@@ -221,14 +231,13 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$ROOT/$TOOLCHAIN \
                        -DENABLE_CCACHE=ON \
                        -DENABLE_LIRC=ON \
                        -DENABLE_EVENTCLIENTS=ON \
-                       -DENABLE_LDGOLD=OFF \
+                       -DENABLE_LDGOLD=ON \
                        $KODI_ARCH \
                        $KODI_OPENGL \
                        $KODI_OPENGLES \
-                       $KODI_OPENMAX \
+                       $KODI_NEON \
                        $KODI_VDPAU \
                        $KODI_VAAPI \
-                       $KODI_JOYSTICK \
                        $KODI_CEC \
                        $KODI_XORG \
                        $KODI_SAMBA \
@@ -248,7 +257,6 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$ROOT/$TOOLCHAIN \
 pre_configure_target() {
 # kodi should never be built with lto
   strip_lto
-  strip_gold
 
   export LIBS="$LIBS -lz -lterminfo"
 }
