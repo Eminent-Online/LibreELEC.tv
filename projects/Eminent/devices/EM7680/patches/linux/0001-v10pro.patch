@@ -1,28 +1,30 @@
-From 63661dd31d650eef0ee8f92dac4b850c7123337c Mon Sep 17 00:00:00 2001
+From 6024144e656f008ca7e1e6bd6c59b462845ec239 Mon Sep 17 00:00:00 2001
 From: alex <surkov.alex@gmail.com>
-Date: Wed, 12 Oct 2016 11:40:02 +0300
+Date: Sat, 26 Aug 2017 17:04:50 +0300
 Subject: [PATCH] v10pro
 
 ---
- arch/arm64/boot/dts/amlogic/gxl_p211.dts     | 1170 ++
- arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts  |   38 +-
- arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts  |   39 +-
- arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts  |   25 +-
- arch/arm64/configs/meson64_defconfig         |    5 +
- arch/arm64/configs/meson64_p211_defconfig    |  517 +
- drivers/amlogic/Kconfig                      |    4 +
- drivers/amlogic/Makefile                     |    3 +
- drivers/amlogic/input/gpio_key/aml_gpiokey.c |   79 +-
- drivers/amlogic/input/remote/remote_main.c   |   32 +
- drivers/amlogic/ledlight/Kconfig             |    7 +
- drivers/amlogic/ledlight/Makefile            |    8 +
- drivers/amlogic/ledlight/ledlight.c          |  512 +
- tools/gator/daemon/defaults_xml.h            |  407 +
- tools/gator/daemon/events.xml                | 1919 +++
- tools/gator/daemon/events_xml.h              |20025 ++++++++++++++++++++++++++
- 16 files changed, 24780 insertions(+), 10 deletions(-)
+ arch/arm64/boot/dts/amlogic/gxl_p211.dts     |  1170 ++
+ arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts  |    38 +-
+ arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts  |    39 +-
+ arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts  |    25 +-
+ arch/arm64/configs/meson64_defconfig         |     5 +
+ arch/arm64/configs/meson64_p211_defconfig    |   517 +
+ drivers/amlogic/Kconfig                      |     3 +
+ drivers/amlogic/Makefile                     |     3 +
+ drivers/amlogic/Makefile.rej                 |     9 +
+ drivers/amlogic/input/gpio_key/aml_gpiokey.c |    79 +-
+ drivers/amlogic/input/remote/remote_main.c   |    32 +
+ drivers/amlogic/ledlight/Kconfig             |     7 +
+ drivers/amlogic/ledlight/Makefile            |     8 +
+ drivers/amlogic/ledlight/ledlight.c          |   512 +
+ tools/gator/daemon/defaults_xml.h            |   407 +
+ tools/gator/daemon/events.xml                |  1919 +++
+ tools/gator/daemon/events_xml.h              | 20025 +++++++++++++++++++++++++
+ 17 files changed, 24788 insertions(+), 10 deletions(-)
  create mode 100644 arch/arm64/boot/dts/amlogic/gxl_p211.dts
  create mode 100644 arch/arm64/configs/meson64_p211_defconfig
+ create mode 100644 drivers/amlogic/Makefile.rej
  create mode 100644 drivers/amlogic/ledlight/Kconfig
  create mode 100644 drivers/amlogic/ledlight/Makefile
  create mode 100644 drivers/amlogic/ledlight/ledlight.c
@@ -1207,7 +1209,7 @@ index 0000000..5a5414c
 +	status = "okay";
 +};
 diff --git a/arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts b/arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts
-index aaba8a4..66e69b1 100644
+index 7260c84..5e13e3a 100644
 --- a/arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts
 +++ b/arch/arm64/boot/dts/amlogic/gxl_p212_1g.dts
 @@ -127,13 +127,14 @@
@@ -1227,7 +1229,7 @@ index aaba8a4..66e69b1 100644
  
  	meson-vout {
  		compatible = "amlogic, meson-vout";
-@@ -1106,6 +1107,39 @@
+@@ -1113,6 +1114,39 @@
  			};
  		};
  	};
@@ -1268,7 +1270,7 @@ index aaba8a4..66e69b1 100644
  
  &pinmux {
 diff --git a/arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts b/arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts
-index d1c93ed..dd98060 100644
+index 196eeeb..d92fb42 100644
 --- a/arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts
 +++ b/arch/arm64/boot/dts/amlogic/gxl_p212_2g.dts
 @@ -128,13 +128,14 @@
@@ -1288,7 +1290,7 @@ index d1c93ed..dd98060 100644
  
  	meson-vout {
  		compatible = "amlogic, meson-vout";
-@@ -1107,6 +1108,40 @@
+@@ -1114,6 +1115,40 @@
  			};
  		};
  	};
@@ -1330,7 +1332,7 @@ index d1c93ed..dd98060 100644
  
  &pinmux {
 diff --git a/arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts b/arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts
-index 3c77834..70873b7 100644
+index 770754b..ddc72c9 100644
 --- a/arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts
 +++ b/arch/arm64/boot/dts/amlogic/gxm_q200_2g.dts
 @@ -128,13 +128,14 @@
@@ -1350,7 +1352,7 @@ index 3c77834..70873b7 100644
  
  	meson-vout {
  		compatible = "amlogic, meson-vout";
-@@ -1176,6 +1177,26 @@
+@@ -1183,6 +1184,26 @@
  			};
  		};
  	};
@@ -1378,10 +1380,10 @@ index 3c77834..70873b7 100644
  
  &pinmux {
 diff --git a/arch/arm64/configs/meson64_defconfig b/arch/arm64/configs/meson64_defconfig
-index a185010..7b92983 100644
+index 281b94f..68ffaff 100644
 --- a/arch/arm64/configs/meson64_defconfig
 +++ b/arch/arm64/configs/meson64_defconfig
-@@ -521,3 +521,8 @@ CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
+@@ -522,3 +522,8 @@ CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
  CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
  CONFIG_CRC_T10DIF=y
  CONFIG_CRC7=y
@@ -1915,10 +1917,10 @@ index 0000000..16b40b6
 +CONFIG_AMLOGIC_LEDLIGHT=y
 \ No newline at end of file
 diff --git a/drivers/amlogic/Kconfig b/drivers/amlogic/Kconfig
-index 75e67e4..abea632 100644
+index e50fc5e..203fb02 100644
 --- a/drivers/amlogic/Kconfig
 +++ b/drivers/amlogic/Kconfig
-@@ -127,4 +127,7 @@ source "drivers/amlogic/watchpoint/Kconfig"
+@@ -127,4 +127,7 @@ source "drivers/amlogic/crypto/Kconfig"
  
  source "drivers/amlogic/watchpoint/Kconfig"
  
@@ -1927,16 +1929,31 @@ index 75e67e4..abea632 100644
 +
  endmenu
 diff --git a/drivers/amlogic/Makefile b/drivers/amlogic/Makefile
-index fd8d419..44a3eeb 100644
+index 7a44de9..908fde3 100644
 --- a/drivers/amlogic/Makefile
 +++ b/drivers/amlogic/Makefile
-@@ -133,3 +133,6 @@ obj-$(CONFIG_AMLOGIC_WATCHPOINT) += watchpoint/
- obj-$(CONFIG_CRYPTO_AML)	+= crypto/
- 
+@@ -135,3 +135,6 @@ obj-$(CONFIG_CRYPTO_AML)	+= crypto/
  obj-$(CONFIG_AMLOGIC_WATCHPOINT) += watchpoint/
+ 
+ obj-$(CONFIG_MESON_PWM) += pwm/
 +
 +#by luobx
 +obj-$(CONFIG_AMLOGIC_LEDLIGHT) += ledlight/
+diff --git a/drivers/amlogic/Makefile.rej b/drivers/amlogic/Makefile.rej
+new file mode 100644
+index 0000000..39a8ebe
+--- /dev/null
++++ b/drivers/amlogic/Makefile.rej
+@@ -0,0 +1,9 @@
++--- drivers/amlogic/Makefile
+++++ drivers/amlogic/Makefile
++@@ -133,3 +133,6 @@
++ obj-$(CONFIG_CRYPTO_AML)	+= crypto/
++ 
++ obj-$(CONFIG_AMLOGIC_WATCHPOINT) += watchpoint/
+++
+++#by luobx
+++obj-$(CONFIG_AMLOGIC_LEDLIGHT) += ledlight/
 diff --git a/drivers/amlogic/input/gpio_key/aml_gpiokey.c b/drivers/amlogic/input/gpio_key/aml_gpiokey.c
 index 213cb54..c85c386 100644
 --- a/drivers/amlogic/input/gpio_key/aml_gpiokey.c
@@ -25047,5 +25064,5 @@ index 0000000..2a9c288
 +};
 +static const unsigned int events_xml_len = 240262;
 -- 
-1.7.10.4
+1.9.1
 
