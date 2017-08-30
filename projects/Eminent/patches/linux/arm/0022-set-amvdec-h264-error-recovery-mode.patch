@@ -1,0 +1,39 @@
+From b4f34628ef33f8630bc2ffedafdfca8f32f95322 Mon Sep 17 00:00:00 2001
+From: alex <surkov.alex@gmail.com>
+Date: Wed, 23 Aug 2017 22:41:40 +0300
+Subject: [PATCH 22/32] set amvdec h264 error recovery mode
+
+---
+ drivers/amlogic/amports/vh264.c      | 2 +-
+ drivers/amlogic/amports/vh264_4k2k.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/amlogic/amports/vh264.c b/drivers/amlogic/amports/vh264.c
+index 91765e4..00d3a3a 100644
+--- a/drivers/amlogic/amports/vh264.c
++++ b/drivers/amlogic/amports/vh264.c
+@@ -237,7 +237,7 @@ static struct vframe_s *p_last_vf;
+ static u32 last_pts, last_pts_remainder;
+ static bool check_pts_discontinue;
+ static u32 wait_buffer_counter;
+-static uint error_recovery_mode = 0;
++static uint error_recovery_mode = 1;
+ static uint error_recovery_mode_in = 3;
+ static uint error_recovery_mode_use = 3;
+ 
+diff --git a/drivers/amlogic/amports/vh264_4k2k.c b/drivers/amlogic/amports/vh264_4k2k.c
+index 85b6560..41b9df6 100755
+--- a/drivers/amlogic/amports/vh264_4k2k.c
++++ b/drivers/amlogic/amports/vh264_4k2k.c
+@@ -97,7 +97,7 @@ static u32 frame_width, frame_height, frame_dur, frame_ar;
+ static struct timer_list recycle_timer;
+ static u32 stat;
+ static u32 error_watchdog_count;
+-static uint error_recovery_mode = 0;
++static uint error_recovery_mode = 1;
+ static u32 sync_outside;
+ static u32 vh264_4k2k_rotation;
+ static u32 first_i_recieved;
+-- 
+1.9.1
+

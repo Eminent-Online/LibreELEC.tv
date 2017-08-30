@@ -1,0 +1,41 @@
+From 892693a73fa644f0f10cf4d8cf32025532508740 Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <jakub.kicinski@netronome.com>
+Date: Thu, 9 Feb 2017 09:17:27 -0800
+Subject: [PATCH 12/32] bitfield.h: add FIELD_FIT() helper
+
+Add a helper for checking at runtime that a value will fit inside
+a specified field/mask.
+
+Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ include/linux/bitfield.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+index f6505d8..8b9d6ff 100644
+--- a/include/linux/bitfield.h
++++ b/include/linux/bitfield.h
+@@ -63,6 +63,19 @@
+ 	})
+ 
+ /**
++ * FIELD_FIT() - check if value fits in the field
++ * @_mask: shifted mask defining the field's length and position
++ * @_val:  value to test against the field
++ *
++ * Return: true if @_val can fit inside @_mask, false if @_val is too big.
++ */
++#define FIELD_FIT(_mask, _val)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_FIT: ");	\
++		!((((typeof(_mask))_val) << __bf_shf(_mask)) & ~(_mask)); \
++	})
++
++/**
+  * FIELD_PREP() - prepare a bitfield element
+  * @_mask: shifted mask defining the field's length and position
+  * @_val:  value to put in the field
+-- 
+1.9.1
+

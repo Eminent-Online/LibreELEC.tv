@@ -1,0 +1,44 @@
+From 9f932be1a6f4f9965a19968ddbecfbc5f146e12c Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Sun, 5 Feb 2017 22:13:00 +0100
+Subject: [PATCH 07/32] drivers/amlogic/video_dev: fix device caps for
+ media_build
+
+---
+ drivers/amlogic/video_dev/amlvideo.c  | 3 ++-
+ drivers/amlogic/video_dev/amlvideo2.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/amlogic/video_dev/amlvideo.c b/drivers/amlogic/video_dev/amlvideo.c
+index 47d0015..8400495 100755
+--- a/drivers/amlogic/video_dev/amlvideo.c
++++ b/drivers/amlogic/video_dev/amlvideo.c
+@@ -435,7 +435,8 @@ static int vidioc_querycap(struct file *file, void *priv, struct v4l2_capability
+     strcpy(cap->card, "amlvideo");
+     strlcpy(cap->bus_info, dev->v4l2_dev.name, sizeof(cap->bus_info));
+     cap->version = AMLVIDEO_VERSION;
+-    cap->capabilities = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
++    cap->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING | V4L2_CAP_READWRITE;
++    cap->capabilities = cap->device_caps | V4L2_CAP_DEVICE_CAPS;
+     return 0;
+ }
+ 
+diff --git a/drivers/amlogic/video_dev/amlvideo2.c b/drivers/amlogic/video_dev/amlvideo2.c
+index 3b8e24e..a628bf1 100755
+--- a/drivers/amlogic/video_dev/amlvideo2.c
++++ b/drivers/amlogic/video_dev/amlvideo2.c
+@@ -2749,9 +2749,10 @@ static int vidioc_querycap(struct file *file, void  *priv,
+ 	strcpy(cap->card, "amlvideo2");
+ 	strlcpy(cap->bus_info, node->vid_dev->v4l2_dev.name, sizeof(cap->bus_info));
+ 	cap->version = AMLVIDEO2_VERSION;
+-	cap->capabilities =	V4L2_CAP_VIDEO_CAPTURE |
++	cap->device_caps =	V4L2_CAP_VIDEO_CAPTURE |
+ 				V4L2_CAP_STREAMING     |
+ 				V4L2_CAP_READWRITE;
++	cap->capabilities = cap->device_caps | V4L2_CAP_DEVICE_CAPS;
+ 	return 0;
+ }
+ 
+-- 
+1.9.1
+

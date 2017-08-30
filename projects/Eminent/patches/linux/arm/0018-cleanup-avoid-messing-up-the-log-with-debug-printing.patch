@@ -1,0 +1,63 @@
+From 8e0887fa0f59e7295aaf94e8cc953c3574203cfb Mon Sep 17 00:00:00 2001
+From: Carlo Caione <carlo@caione.org>
+Date: Fri, 6 Feb 2015 11:44:44 +0100
+Subject: [PATCH 18/32] cleanup: avoid messing up the log with debug printing
+
+My log is utterly filled with messages like:
+
+- config uart_ao_ttyS0:: Character length 8bits/char Signed
+- enter aml_set_bias_level level: 1
+
+since it is just useless print(k)ing, delete it.
+
+Signed-off-by: Carlo Caione <carlo@caione.org>
+---
+ drivers/amlogic/uart/uart/meson_uart.c | 5 -----
+ sound/soc/aml/m8/aml_m8.c              | 1 -
+ 2 files changed, 6 deletions(-)
+
+diff --git a/drivers/amlogic/uart/uart/meson_uart.c b/drivers/amlogic/uart/uart/meson_uart.c
+index 7e2e7d6..6a32cbc 100755
+--- a/drivers/amlogic/uart/uart/meson_uart.c
++++ b/drivers/amlogic/uart/uart/meson_uart.c
+@@ -403,25 +403,20 @@ am_uart_set_termios(struct uart_port *port, struct ktermios *termios,
+     tmp = readl(&uart->mode);
+     switch (termios->c_cflag & CSIZE) {
+     case CS8:
+-        printk(KERN_DEBUG "config %s: Character length 8bits/char\n", mup->name);
+         tmp &= ~(0x3 << 20);
+         break;
+     case CS7:
+-        printk(KERN_DEBUG "config %s: Character length 7bits/char\n", mup->name);
+         tmp &= ~(0x1 << 21);
+         tmp |= (0x1 << 20);
+         break;
+     case CS6:
+-        printk(KERN_DEBUG "config %s: Character length 6bits/char\n", mup->name);
+         tmp |= 0x1 << 21;
+         tmp &= ~(0x1 << 20);
+         break;
+     case CS5:
+-        printk(KERN_DEBUG "config %s: Character length 5bits/char\n", mup->name);
+         tmp |= 0x3 << 20;
+         break;
+     default:
+-        printk(KERN_DEBUG "default config %s: Character length 8bits/char\n", mup->name);
+         tmp &= ~(0x3 << 20);
+         break;
+     }
+diff --git a/sound/soc/aml/m8/aml_m8.c b/sound/soc/aml/m8/aml_m8.c
+index ac2a754..3419f06 100755
+--- a/sound/soc/aml/m8/aml_m8.c
++++ b/sound/soc/aml/m8/aml_m8.c
+@@ -367,7 +367,6 @@ static int aml_set_bias_level(struct snd_soc_card *card,
+     struct aml_audio_private_data * p_aml_audio;
+     int hp_state;
+ 
+-    printk(KERN_DEBUG "enter %s level: %d\n", __func__, level);
+     p_aml_audio = snd_soc_card_get_drvdata(card);
+ 	hp_state = p_aml_audio->detect_flag;
+ 
+-- 
+1.9.1
+
