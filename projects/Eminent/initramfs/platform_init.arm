@@ -18,41 +18,23 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-# Force 720p display mode at startup
-echo 720p > /sys/class/display/mode
-
-# Enable first framebuffer
-echo 0 > /sys/class/graphics/fb0/blank
-
-# Disable second framebuffer
-echo 1 > /sys/class/graphics/fb1/blank
-
-# Disable framebuffer scaling
-echo 0 > /sys/class/graphics/fb0/free_scale
-
-# Set framebuffer geometry
-fbset -fb /dev/fb0 -g 1280 720 1280 1440 32
-
-# Set framebuffer size in CVBS mode to match the resolution,
-# for splash screen to be shown correctly
-hpd_state=$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)
-if [ "$hpd_state" != "1" ]; then # HDMI is not connected
-  display_height=480
-  display_mode=$(cat /sys/class/display/mode)
-  if [ "$display_mode" = "576cvbs" ]; then
-    display_height=576
-  fi
-  fbset -fb /dev/fb0 -g 720 "$display_height" 720 "$display_height" 32
-  fbset -fb /dev/fb1 -g 720 "$display_height" 720 "$display_height" 32
-fi
-
-# Include deinterlacer into default VFM map
-echo rm default > /sys/class/vfm/map
-echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+display_mode=$(cat /sys/class/display/mode)
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case $arg in
+    hdmimode=*)
+      hdmimode=${arg#*=}
+      ;;
+    BOOT_IMAGE=*)
+      BOOT_IMAGE=${arg#*=}
+      ;;
+    boot=*)
+      boot=${arg#*=}
+      ;;
+    disk=*)
+      disk=${arg#*=}
+      ;;
     scaling_governor=*)
       scaling_governor="${arg#*=}"
       ;;
@@ -65,21 +47,47 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
+echo $hdmimode > /sys/class/display/mode
+
+# Enable framebuffer device
+echo 0 > /sys/class/graphics/fb0/blank
+
+# Blank fb1 to prevent static noise
+echo 1 > /sys/class/graphics/fb1/blank
+
+# Set framebuffer geometry to match the resolution
+case $display_mode in
+  480*)            X=720  Y=480  ;;
+  576*)            X=720  Y=576  ;;
+  720p*)           X=1280 Y=720  ;;
+  *)               X=1920 Y=1080 ;;
+esac
+
+fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
+fbset -fb /dev/fb1 -g 32 32 32 32 32
+echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
+
+# Include deinterlacer into default VFM map
+echo rm default > /sys/class/vfm/map
+echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
+
 # Boot with performance governor, then switch to the governor specified in the kernel command line
-cpu_idx=0
-while [ $cpu_idx -lt 128 ]; do
-  cpufreq="/sys/devices/system/cpu/cpu$cpu_idx/cpufreq"
-  if [ ! -d "$cpufreq" ]; then
-    break
-  fi
-  if [ -n "$scaling_governor" ]; then
-    echo "$scaling_governor" > "$cpufreq/scaling_governor"
-  fi
-  if [ -n "$scaling_min_freq" ]; then
-    echo "$scaling_min_freq" > "$cpufreq/scaling_min_freq"
-  fi
-  if [ -n "$scaling_max_freq" ]; then
-    echo "$scaling_max_freq" > "$cpufreq/scaling_max_freq"
-  fi
-  cpu_idx=`expr $cpu_idx + 1`
+# Assume SMP uses shared cpufreq policy for all CPUs
+cpufreq="/sys/devices/system/cpu/cpu0/cpufreq"
+if [ -n "$scaling_governor" ]; then
+  echo "$scaling_governor" > "$cpufreq/scaling_governor"
+fi
+if [ -n "$scaling_min_freq" ]; then
+  echo "$scaling_min_freq" > "$cpufreq/scaling_min_freq"
+fi
+if [ -n "$scaling_max_freq" ]; then
+  echo "$scaling_max_freq" > "$cpufreq/scaling_max_freq"
+  echo "$scaling_max_freq" > "$cpufreq/scaling_dflt_freq"
+fi
+
+for part in /sys/block/*/queue/add_random; do
+  echo 0 > "$part"
 done
+
+echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
