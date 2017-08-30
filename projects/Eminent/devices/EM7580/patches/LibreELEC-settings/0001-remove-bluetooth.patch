@@ -46,7 +46,7 @@ deleted file mode 100644
 index b4ca66c..0000000
 --- a/src/resources/lib/modules/bluetooth.py
 +++ /dev/null
-@@ -1,1195 +0,0 @@
+@@ -1,1197 +0,0 @@
 -################################################################################
 -#      This file is part of OpenELEC - http://www.openelec.tv
 -#      Copyright (C) 2009-2013 Stephan Raue (stephan@openelec.tv)
@@ -454,6 +454,8 @@ index b4ca66c..0000000
 -
 -    def menu_connections(self, focusItem=None):
 -        try:
+-            if self.oe.is_busy():
+-                return 0
 -            if not hasattr(self.oe, 'winOeMain'):
 -                return 0
 -            if not self.oe.winOeMain.visible:
