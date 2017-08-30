@@ -316,7 +316,6 @@
         <staytime default="true">5</staytime>
     </slideshow>
     <smb>
-        <maxprotocol>1</maxprotocol>
         <winsserver default="true">0.0.0.0</winsserver>
         <workgroup default="true">WORKGROUP</workgroup>
     </smb>
