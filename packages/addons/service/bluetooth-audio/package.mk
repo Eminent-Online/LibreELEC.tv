@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,25 +16,31 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="inputstream.adaptive"
-PKG_VERSION="f2904b5"
+PKG_NAME="bluetooth-audio"
+PKG_VERSION="0"
+PKG_REV="102"
+PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.kodi.tv"
-PKG_URL="https://github.com/peak3d/inputstream.adaptive/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain kodi-platform"
-PKG_SECTION=""
-PKG_SHORTDESC="inputstream.adaptive"
-PKG_LONGDESC="inputstream.adaptive"
+PKG_SITE=""
+PKG_URL=""
+PKG_DEPENDS_TARGET="toolchain"
+PKG_SECTION="service"
+PKG_SHORTDESC="Provides the ability to change the kodi audio device if a bluetooth audio device is connected"
+PKG_LONGDESC="Provides the ability to change the kodi audio device if a bluetooth audio device is connected"
+PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
+PKG_ADDON_NAME="Bluetooth Audio Device Changer"
+PKG_ADDON_TYPE="xbmc.service"
+
+make_target() {
+  :
+}
+
+makeinstall_target() {
+  :
+}
 
 addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID
-  cp -P $PKG_BUILD/.$TARGET_NAME/wvdecrypter/libssd_wv.so $ADDON_BUILD/$PKG_ADDON_ID
+  :
 }
