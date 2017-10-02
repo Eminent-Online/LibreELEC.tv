@@ -20,6 +20,8 @@
 
 display_mode=$(cat /sys/class/display/mode)
 
+hdmimode=720p
+
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case $arg in
