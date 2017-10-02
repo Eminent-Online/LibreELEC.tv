@@ -1,0 +1,26 @@
+diff --git a/src/resources/lib/modules/system.py b/src/resources/lib/modules/system.py
+index 6c7ebfa..9b9bee8 100644
+--- a/src/resources/lib/modules/system.py
++++ b/src/resources/lib/modules/system.py
+@@ -141,10 +141,10 @@ class system:
+                     'settings': {
+                         'AutoUpdate': {
+                             'name': 32014,
+-                            'value': 'auto',
++                            'value': 'manual',
+                             'action': 'set_auto_update',
+                             'type': 'multivalue',
+-                            'values': ['auto', 'manual'],
++                            'values': ['manual', 'auto'],
+                             'InfoText': 714,
+                             'order': 1,
+                             },
+@@ -206,7 +206,7 @@ class system:
+                             },
+                         'Channel': {
+                             'name': 32015,
+-                            'value': '',
++                            'value': 'LibreELEC-8.0',
+                             'action': 'set_channel',
+                             'type': 'multivalue',
+                             'parent': {
