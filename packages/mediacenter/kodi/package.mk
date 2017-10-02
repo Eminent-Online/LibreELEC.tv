@@ -317,6 +317,12 @@ post_makeinstall_target() {
       cp -R $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
     fi
 
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/cec_CEC_Adapter.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/cec_CEC_Adapter.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/cec_CEC_Adapter.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/cec_CEC_Adapter.xml $INSTALL/usr/share/kodi/config
+    fi
+
     if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait ]; then
       cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait $INSTALL/usr/share/kodi/config
     elif [ -f $PROJECT_DIR/$PROJECT/kodi/network_wait ]; then

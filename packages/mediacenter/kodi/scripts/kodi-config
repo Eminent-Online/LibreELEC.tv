@@ -25,7 +25,7 @@ if [ -f $HOME/.kodi/userdata/guisettings.xml ] ; then
     # max res on first boot exclude smpte
     DEVICE=$(cat /etc/device)
     if [ "$DEVICE" = "EM7580" ]; then
-      maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz | grep -v 4k2k | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
+      maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz | grep -v 4k2k | grep -x 1080p);
     else
       maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz |tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
     fi
@@ -39,7 +39,7 @@ if [ ! -f $HOME/.kodi/userdata/guisettings.xml ] ; then
   # max res on first boot exclude smpte
   DEVICE=$(cat /etc/device)
   if [ "$DEVICE" = "EM7580" ]; then
-    maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 4k2k | grep -v 24hz| tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
+    maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 4k2k | grep -v 24hz | grep -x 1080p);
   else
     maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
   fi
@@ -99,6 +99,14 @@ if [ ! -f $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml ]; then
     mkdir -p $HOME/.kodi/userdata/addon_data/weather.yahoo
     cp /usr/share/kodi/config/weather.yahoo.settings.xml $HOME/.kodi/userdata/addon_data/weather.yahoo/settings.xml
     cp /usr/share/kodi/config/Location727232.dat $HOME/.kodi/userdata/addon_data/weather.yahoo/Location727232.dat
+  fi
+fi
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/peripheral_data/cec_CEC_Adapter.xml ]; then
+  if [ -f /usr/share/kodi/config/cec_CEC_Adapter.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/peripheral_data
+    cp /usr/share/kodi/config/cec_CEC_Adapter.xml $HOME/.kodi/userdata/peripheral_data/cec_CEC_Adapter.xml
   fi
 fi
 
