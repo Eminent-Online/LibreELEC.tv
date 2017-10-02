@@ -5,7 +5,7 @@
         <subhearing default="true">false</subhearing>
     </accessibility>
     <addons>
-        <unknownsources default="true">true</unknownsources>
+        <unknownsources default="true">false</unknownsources>
     </addons>
     <audiocds>
         <autoaction default="true">0</autoaction>
@@ -17,7 +17,7 @@
     </audiocds>
     <audiooutput>
         <ac3passthrough default="true">true</ac3passthrough>
-        <ac3transcode default="true">false</ac3transcode>
+        <ac3transcode>true</ac3transcode>
         <atempothreshold default="true">2</atempothreshold>
         <audiodevice>ALSA:iec958:CARD=AMLM8AUDIO,DEV=0</audiodevice>
         <boostcenter default="true">0</boostcenter>
@@ -106,7 +106,7 @@
             <level>0</level>
             <showhigherlevels>true</showhigherlevels>
         </eventlog>
-        <systemtotaluptime>272</systemtotaluptime>
+        <systemtotaluptime>292</systemtotaluptime>
     </general>
     <input>
         <asknewcontrollers default="true">true</asknewcontrollers>
@@ -138,7 +138,7 @@
         <skincolors default="true">SKINDEFAULT</skincolors>
         <skintheme default="true">SKINDEFAULT</skintheme>
         <skinzoom default="true">0</skinzoom>
-        <soundskin default="true">resource.uisounds.kodi</soundskin>
+        <soundskin></soundskin>
         <startupwindow default="true">10000</startupwindow>
         <stereostrength default="true">5</stereostrength>
     </lookandfeel>
@@ -316,7 +316,7 @@
         <staytime default="true">5</staytime>
     </slideshow>
     <smb>
-        <maxprotocol>1</maxprotocol>
+        <maxprotocol>3</maxprotocol>
         <winsserver default="true">0.0.0.0</winsserver>
         <workgroup default="true">WORKGROUP</workgroup>
     </smb>

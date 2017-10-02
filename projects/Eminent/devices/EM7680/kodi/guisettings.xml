@@ -5,7 +5,7 @@
         <subhearing default="true">false</subhearing>
     </accessibility>
     <addons>
-        <unknownsources default="true">true</unknownsources>
+        <unknownsources>false</unknownsources>
     </addons>
     <audiocds>
         <autoaction default="true">0</autoaction>
@@ -26,7 +26,7 @@
         <dspaddonsenabled default="true">false</dspaddonsenabled>
         <dtshdpassthrough default="true">false</dtshdpassthrough>
         <dtspassthrough>true</dtspassthrough>
-        <eac3passthrough default="true">false</eac3passthrough>
+        <eac3passthrough>true</eac3passthrough>
         <guisoundmode>0</guisoundmode>
         <maintainoriginalvolume default="true">true</maintainoriginalvolume>
         <passthrough default="true">false</passthrough>
@@ -106,7 +106,7 @@
             <level>0</level>
             <showhigherlevels>true</showhigherlevels>
         </eventlog>
-        <systemtotaluptime>272</systemtotaluptime>
+        <systemtotaluptime>288</systemtotaluptime>
     </general>
     <input>
         <asknewcontrollers default="true">true</asknewcontrollers>
@@ -134,11 +134,11 @@
         <enablerssfeeds default="true">false</enablerssfeeds>
         <font default="true">Default</font>
         <rssedit default="true"></rssedit>
-        <adjustrefreshrate default="true">2</adjustrefreshrate>
+        <skin default="true">skin.estuary</skin>
         <skincolors default="true">SKINDEFAULT</skincolors>
         <skintheme default="true">SKINDEFAULT</skintheme>
         <skinzoom default="true">0</skinzoom>
-        <soundskin default="true">resource.uisounds.kodi</soundskin>
+        <soundskin></soundskin>
         <startupwindow default="true">10000</startupwindow>
         <stereostrength default="true">5</stereostrength>
     </lookandfeel>
@@ -316,7 +316,7 @@
         <staytime default="true">5</staytime>
     </slideshow>
     <smb>
-        <maxprotocol>1</maxprotocol>
+        <maxprotocol>3</maxprotocol>
         <winsserver default="true">0.0.0.0</winsserver>
         <workgroup default="true">WORKGROUP</workgroup>
     </smb>
