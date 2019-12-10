@@ -166,3 +166,5 @@
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"
+
+   INITRAMFS_PARTED_SUPPORT="yes"
