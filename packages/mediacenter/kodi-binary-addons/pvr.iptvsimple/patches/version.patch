@@ -1,0 +1,26 @@
+diff --git a/pvr.iptvsimple/addon.xml.in b/pvr.iptvsimple/addon.xml.in
+index a5b6af0..312bb37 100644
+--- a/pvr.iptvsimple/addon.xml.in
++++ b/pvr.iptvsimple/addon.xml.in
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+   id="pvr.iptvsimple"
+-  version="3.8.3"
++  version="9.8.3"
+   name="PVR IPTV Simple Client"
+   provider-name="nightik">
+   <requires>@ADDON_DEPENDS@</requires>
+diff --git a/src/client.cpp b/src/client.cpp
+index e959163..bed7c18 100644
+--- a/src/client.cpp
++++ b/src/client.cpp
+@@ -242,7 +242,7 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
+     XBMC->DeleteFile(strFile.c_str());
+   }
+ 
+-  return ADDON_STATUS_NEED_RESTART;
++  return ADDON_STATUS_OK;
+ }
+ 
+ /***********************************************************

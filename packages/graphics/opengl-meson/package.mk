@@ -5,24 +5,8 @@ PKG_NAME="opengl-meson"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
-case $MESON_FAMILY in
-  8)
-    PKG_VERSION="8-r5p1-02rel0-armhf"
-    PKG_SHA256="717739c9f65f6782e3185aad09d01f228873315f70f9a58c0526b9e63a6e386f"
-    ;;
-  6)
-    PKG_VERSION="6-r5p1-02rel0-armhf"
-    PKG_SHA256="de38a1fa23191bd5de5c85c66627d4537775ee4634b71baa8d0e241b8b9d4ba2"
-    ;;
-  gxbb)
-    if [ "$TARGET_ARCH" = "arm" ]; then
-      PKG_VERSION="8-r5p1-02rel0-armhf"
-      PKG_SHA256="717739c9f65f6782e3185aad09d01f228873315f70f9a58c0526b9e63a6e386f"
-    else
-      PKG_VERSION="gxbb-r5p1-01rel0"
-    fi
-;;
-esac
+PKG_VERSION="8-r5p1-01rel0-armhf"
+PKG_SHA256="b2ad356f0f8c06c8bca077fe2dd5568b83e1879d32bea20c551ab1bf72402c29"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="OpenGL ES pre-compiled libraries for Mali GPUs found in Amlogic Meson SoCs."

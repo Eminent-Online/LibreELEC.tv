@@ -24,9 +24,17 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-3.14)
-    PKG_VERSION="6d8fbb4ee61a7779ac57b5961e076f0c63ff8b65"
-    PKG_SHA256="ef05c88779c893f92e92e5315d0e5396f34c32289726c301fae7ffe8c4214227"
-    PKG_URL="https://github.com/LibreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
+    PKG_VERSION="ed95c4fc0bf54c0f1baa8696d075c7e3b7ca5144"
+    #PKG_SHA256="418e5676f887a2d09b44ee474efd462f11c098064de9d337dae2c1056eef92ac"
+    PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
+    PKG_BUILD_PERF="no"
+    ;;
+  amlogic-3.141)
+    PKG_VERSION="0b4adecbd7d7cebd937ed87576c675a43fc548d9"
+    PKG_SHA256="80bdf5eee3ac5e1aba128cf123bf449190db71460674d93d2f5c47feb6e6e224"
+    PKG_URL="https://github.com/CoreELEC/linux-amlogic/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     PKG_BUILD_PERF="no"
@@ -38,14 +46,20 @@ case "$LINUX" in
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
   raspberrypi)
-    PKG_VERSION="5040b4b78e4cb74a6364d9a7c6cca0385e2dffd8" # 4.19.50
-    PKG_SHA256="134a9821db00c3c826dfeb86be9439a4d0c5b10796f7173a2e5d5728ef2fc979"
+    PKG_VERSION="5c4a6441f890845472a698e35c8df995804e06e2" # 4.19.17
+    PKG_SHA256="58eac16e603edfd106993ae057bcc13adf3f8ffce609172f404144696edd7221"
     PKG_URL="https://github.com/raspberrypi/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="linux-$LINUX-$PKG_VERSION.tar.gz"
     ;;
+  custom)
+    PKG_VERSION="$KERNEL_VERSION"
+    PKG_URL="$KERNEL_URL"
+    PKG_SOURCE_DIR="$KERNEL_SOURCE_DIR"
+    PKG_PATCH_DIRS="$KERNEL_PATCH_DIRS"
+    ;;
   *)
-    PKG_VERSION="4.19.50"
-    PKG_SHA256="a9987423918abd20ee68d6e9b14b7225eaca8a586bf75fb56c49f6e1e47ce01e"
+    PKG_VERSION="4.19.17"
+    PKG_SHA256="872d92a17a2d252ccd6334503bc8f67eebceeb99cb822a77f5c72b936f2ccb59"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;
@@ -193,6 +207,8 @@ make_target() {
       NO_LIBAUDIT=1 \
       NO_LZMA=1 \
       NO_SDT=1 \
+      LDFLAGS="$LDFLAGS -ldw -ldwfl -lebl -lelf -ldl -lz" \
+      EXTRA_PERFLIBS="-lebl" \
       CROSS_COMPILE="$TARGET_PREFIX" \
       JOBS="$CONCURRENCY_MAKE_LEVEL" \
         make $PERF_BUILD_ARGS
@@ -221,18 +237,18 @@ make_target() {
     DTB_BLOBS=($(ls arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb 2>/dev/null || true))
     DTB_BLOBS_COUNT="${#DTB_BLOBS[@]}"
     DTB_BLOB_OUTPUT="arch/$TARGET_KERNEL_ARCH/boot/dtb.img"
-    ANDROID_BOOTIMG_SECOND="--second $DTB_BLOB_OUTPUT"
+    MKBOOTIMG_SECOND="$DTB_BLOB_OUTPUT"
 
     if [ "$DTB_BLOBS_COUNT" -gt 1 ]; then
       $TOOLCHAIN/bin/dtbTool -o arch/$TARGET_KERNEL_ARCH/boot/dtb.img -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
     elif [ "$DTB_BLOBS_COUNT" -eq 1 ]; then
       cp -PR $DTB_BLOBS $DTB_BLOB_OUTPUT
     else
-      ANDROID_BOOTIMG_SECOND=""
+      MKBOOTIMG_SECOND=""
     fi
 
     LDFLAGS="" mkbootimg --kernel arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET --ramdisk $BUILD/image/initramfs.cpio \
-      $ANDROID_BOOTIMG_SECOND $ANDROID_BOOTIMG_OPTIONS --output arch/$TARGET_KERNEL_ARCH/boot/boot.img
+      --second $MKBOOTIMG_SECOND $ANDROID_BOOTIMG_OPTIONS --output arch/$TARGET_KERNEL_ARCH/boot/boot.img
 
     mv -f arch/$TARGET_KERNEL_ARCH/boot/boot.img arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET
 
@@ -242,7 +258,7 @@ make_target() {
 makeinstall_target() {
   if [ "$BOOTLOADER" = "u-boot" ]; then
     mkdir -p $INSTALL/usr/share/bootloader
-    if [ -d arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic -a -f arch/$TARGET_KERNEL_ARCH/boot/dtb.img ]; then
+    if [ -d arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic -a -f "$MKBOOTIMG_SECOND" ]; then
       cp arch/$TARGET_KERNEL_ARCH/boot/dtb.img $INSTALL/usr/share/bootloader/dtb.img 2>/dev/null || :
     else
       for dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/*.dtb arch/$TARGET_KERNEL_ARCH/boot/dts/*/*.dtb; do

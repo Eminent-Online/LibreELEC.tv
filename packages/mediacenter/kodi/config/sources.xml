@@ -1,17 +1,4 @@
 <sources>
-  <video>
-      <default pathversion="1"></default>
-      <source>
-          <name>Videos</name>
-          <path pathversion="1">/storage/videos/</path>
-          <allowsharing>true</allowsharing>
-      </source>
-      <source>
-          <name>TV Shows</name>
-          <path pathversion="1">/storage/tvshows/</path>
-          <allowsharing>true</allowsharing>
-      </source>
-  </video>
   <music>
       <default pathversion="1"></default>
       <source>

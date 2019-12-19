@@ -12,20 +12,19 @@ PKG_PATCH_DIRS="$KODI_VENDOR"
 
 case $KODI_VENDOR in
   raspberrypi)
-    PKG_VERSION="newclock5_18.2-Leia"
-    PKG_SHA256="ff3f1770dd7a3223fb1f9441c0abf028bb4c3d406c5d9ba6fe202872b7237ee5"
+    PKG_VERSION="newclock5_18.0-Leia"
+    PKG_SHA256="9c056808eecc7dd2e72fffd3f3412d83c60fe3742bc0d96f16f9abdfc55c8012"
     PKG_URL="https://github.com/popcornmix/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   rockchip)
-    PKG_VERSION="rockchip_18.2-Leia"
-    PKG_SHA256="437b3608bb4ddb4703cc2ee86acb0a4065846244b84fe555d9f4c7b74a49b263"
+    PKG_VERSION="rockchip_18.0-Leia"
+    PKG_SHA256="4f52928c06cbb684942b5bbb6623e2da5622ef278189ca5a8aefa5f801f6a22c"
     PKG_URL="https://github.com/kwiboo/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$KODI_VENDOR-$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="18.2-Leia"
-    PKG_SHA256="07b8cffc396473523a51354dc95dfffb54a6a456b82cda7ad67dc2c052d99f64"
+    PKG_VERSION="18.4-Leia"
     PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_NAME="kodi-$PKG_VERSION.tar.gz"
     ;;
@@ -40,6 +39,8 @@ configure_package() {
   get_graphicdrivers
 
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
+
+  PKG_PATCH_DIRS="amlogic"
 
   if [ "$DISPLAYSERVER" = "x11" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
@@ -312,6 +313,38 @@ post_makeinstall_target() {
                                 $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
                                 > $INSTALL/usr/share/kodi/system/settings/appliance.xml
 
+# install project specific configs
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/weather.yahoo.settings.xml $INSTALL/usr/share/kodi/config
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/cec_CEC_Adapter.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/cec_CEC_Adapter.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/cec_CEC_Adapter.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/cec_CEC_Adapter.xml $INSTALL/usr/share/kodi/config
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/network_wait $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/network_wait ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/network_wait $INSTALL/usr/share/kodi/config
+    fi
+
+  mkdir -p $INSTALL/usr/share/kodi/media
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/Splash.png ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/Splash.png $INSTALL/usr/share/kodi/media
+    fi
+
+    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/skin.estuary.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/skin.estuary.settings.xml $INSTALL/usr/share/kodi/config
+    elif [ -f $PROJECT_DIR/$PROJECT/kodi/skin.estuary.settings.xml ]; then
+      cp -R $PROJECT_DIR/$PROJECT/kodi/skin.estuary.settings.xml $INSTALL/usr/share/kodi/config
+    fi
+
   # update addon manifest
   ADDON_MANIFEST=$INSTALL/usr/share/kodi/system/addon-manifest.xml
   xmlstarlet ed -L -d "/addons/addon[text()='service.xbmc.versioncheck']" $ADDON_MANIFEST
@@ -321,6 +354,9 @@ post_makeinstall_target() {
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "os.openelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.libreelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.libreelec.settings" $ADDON_MANIFEST
+#  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "inputstream.adaptive" $ADDON_MANIFEST
+#  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "inputstream.rtmp" $ADDON_MANIFEST
+  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "skin.confluence" $ADDON_MANIFEST
 
   if [ "$DRIVER_ADDONS_SUPPORT" = "yes" ]; then
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "script.program.driverselect" $ADDON_MANIFEST
@@ -328,6 +364,24 @@ post_makeinstall_target() {
 
   if [ "$DEVICE" = "Slice" -o "$DEVICE" = "Slice3" ]; then
     xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.slice" $ADDON_MANIFEST
+  fi
+
+  if [ -d $ROOT/addons/lang ]; then
+    mkdir -p $INSTALL/usr/share/kodi/addons
+    for i in `ls $ROOT/addons/lang | grep zip`
+    do
+      unzip $ROOT/addons/lang/$i -d $INSTALL/usr/share/kodi/addons
+      xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "`unzip -p $ROOT/addons/lang/$i */addon.xml | awk -F= '/id=/ { print $2 }' | awk -F'"' '{ print $2 }'`" $ADDON_MANIFEST
+    done
+  fi
+
+  if [ -d $ROOT/addons ]; then
+    mkdir -p $INSTALL/usr/share/kodi/addons
+    for i in `ls $ROOT/addons | grep zip`
+    do
+      unzip $ROOT/addons/$i -d $INSTALL/usr/share/kodi/addons
+      xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "`unzip -p $ROOT/addons/$i */addon.xml | awk -F= '/addon\ id=/ { print $2 }' | awk -F'"' '{ print $2 }'`" $ADDON_MANIFEST
+    done
   fi
 
   # more binaddons cross compile badness meh

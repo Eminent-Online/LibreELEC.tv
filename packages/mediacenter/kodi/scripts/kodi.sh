@@ -46,11 +46,7 @@ single_stacktrace()
   find "$1" -name 'core.*kodi.bin.*' | while read core; do
     echo "=====>  Core file: "$core"" >> $FILE
     echo "        =========================================" >> $FILE
-    if [ -f /storage/.config/debug.enhanced ]; then
-      gdb /usr/lib/kodi/kodi.bin --core="$core" --batch -ex "thread apply all bt full" -ex "info registers" -ex "set print asm-demangle on" -ex "disassemble" 2>/dev/null >> $FILE
-    else
-      gdb /usr/lib/kodi/kodi.bin --core="$core" --batch -ex "thread apply all bt" 2>/dev/null >> $FILE
-    fi
+    gdb /usr/lib/kodi/kodi.bin --core="$core" --batch -ex "thread apply all bt" 2>/dev/null >> $FILE
     rm -f "$core"
   done
 }

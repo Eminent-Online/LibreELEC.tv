@@ -1,0 +1,31 @@
+#!/bin/sh
+
+IMAGE="/tmp/cache/update.zip"
+source=$1
+
+mkdir -p /tmp/cache
+mount -t ext4 /dev/cache /tmp/cache
+
+rm -f /tmp/cache/*.zip
+wget $source -O /tmp/update.zip
+cd /tmp;unzip -o update.zip
+mv Libre*.zip /tmp/cache/update.zip
+#wget $source -O /tmp/cache/update.zip
+sync
+
+if [ ! -f "${IMAGE}" ]; then
+  echo "Error: ${IMAGE} not found"
+  exit 1
+fi
+
+mkdir -p /tmp/cache/recovery
+echo -e "--update_package=/cache/update.zip\n--wipe_cache\n--wipe_data" > /tmp/cache/recovery/command || exit 1
+sync
+umount /tmp/cache
+#mount -o,ro remount /storage
+
+echo "Update firmware"
+#dd if=/dev/dtb of=/storage/dtb.img bs=262144 count=1
+dd if=/tmp/dtb.img of=/dev/dtb bs=262144 count=1
+reboot recovery
+

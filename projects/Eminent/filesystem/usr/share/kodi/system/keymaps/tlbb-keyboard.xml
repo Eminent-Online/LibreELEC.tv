@@ -1,0 +1,47 @@
+<keymap>
+    <global>
+	<keyboard>
+	    <key id="61588">runaddon(service.libreelec.settings)</key>
+	    <key id="61584">Container.NextViewMode</key>
+	    <key id="61590">activatewindow(videos)</key>
+	    <key id="61585">activatewindow(videos)</key>
+	    <key id="61594">activatewindow(favourites)</key>
+	    <key id="61586">activatewindow(favourites)</key>
+	    <key id="61589">activatewindow(music)</key>
+	    <key id="61499">activatewindow(pictures)</key>
+	    <key id="61587">activatewindow(pictures)</key>
+	    <key id="61574">activatewindow(videos,tvshows )</key>
+	    <key id="61595">activatewindow(settings)</key>
+	    <key id="61622">ActivateWindow(Home)</key>
+	    <key id="61625">volumeup</key>
+	    <key id="61624">volumedown</key>
+	    <key id="61623">mute</key>
+	    <key id="61528">stop</key>
+	    <key id="61510">fastforward</key>
+	    <key id="61522">rewind</key>
+	    <key id="61486">stepforward</key>
+	    <key id="61484">stepback</key>
+	    <key id="61573">subtitledelayminus</key>
+	    <key id="61572">subtitledelayplus</key>
+	    <key id="61448">back</key>
+	    <key id="61449">back</key>
+	    <key id="61507">contextmenu</key>
+	</keyboard>
+    </global>
+    <fullscreenvideo>
+	<keyboard>
+	    <key id="61584">showsubtitles</key>
+	    <key id="61528">stop</key>
+	    <key id="61587">activatewindow(videobookmarks)</key>
+	    <key id="61585">ActivateWindow(osdvideosettings)</key>
+	    <key id="61584">activatewindow(subtitlesearch)</key>
+	    <key id="61586">activatewindow(osdaudiosettings)</key>
+	    <key id="61522">rewind</key>
+	    <key id="61510">fastforward</key>
+	    <key id="61572">subtitledelayplus</key>
+	    <key id="61573">subtitledelayminus</key>
+	    <key id="61519">audiodelay</key>
+	    <key id="61507">contextmenu</key>
+	</keyboard>
+    </fullscreenvideo>
+</keymap>

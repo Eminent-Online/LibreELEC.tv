@@ -4,14 +4,79 @@
 # Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
+# common setup guisettings
+if [ -f $HOME/.kodi/userdata/guisettings.xml ] ; then
+  def=$(sed -n '/<screenmode>/p' $HOME/.kodi/userdata/guisettings.xml)
+  if [ -n  $def ]; then
+    sed -i -e "s|<screenmode>.*$||" $HOME/.kodi/userdata/guisettings.xml
+    # max res on first boot exclude smpte
+    maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz |tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
+    if [ ! -z "$maxRes" ]; then
+      echo $maxRes > /sys/class/display/mode
+    fi
+  fi
+fi
+
+if [ ! -f $HOME/.kodi/userdata/guisettings.xml ] ; then
+  # max res on first boot exclude smpte
+  maxRes=$(cat /sys/class/amhdmitx/amhdmitx0/disp_cap | grep -v smpte | grep -v 24hz | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
+  if [ ! -z "$maxRes" ]; then
+    echo $maxRes > /sys/class/display/mode
+  fi
+fi
+
+# kodi network wait
+if [ ! -f $HOME/.cache/libreelec/network_wait ] ; then
+    mkdir -p $HOME/.cache/libreelec
+    cp -f /usr/share/kodi/config/network_wait $HOME/.cache/libreelec/network_wait
+fi
+
+# restore addons
+if [ ! -f $HOME/.cache/.restore_addons_`cat /etc/release` ] ; then
+  if [ -f /usr/share/kodi/config/addons.tar ]; then
+    tar xf /usr/share/kodi/config/addons.tar -C /
+    rm -f $HOME/.cache/.restore_addon*
+    touch $HOME/.cache/.restore_addons_`cat /etc/release`
+  fi
+fi
+
+# restore backup
+if [ ! -f $HOME/.cache/.restore_complete ] ; then
+  if [ -f /usr/share/kodi/config/backup.tar ]; then
+    mkdir -p $HOME/.restore
+    cp /usr/share/kodi/config/backup.tar $HOME/.restore/$(date +%Y%m%d%H%M%S).tar
+    touch $HOME/.cache/.restore_complete
+    sync
+    reboot
+  fi
+fi
+
 KODI_ROOT=$HOME/.kodi
 
 BOOT_STATE="$(cat $HOME/.config/boot.status 2>/dev/null)"
+
+mkdir -p $KODI_ROOT/userdata
 
 # hack: make addon-bins executable
 # done in kodi on addon install. but just in case..
 chmod +x $KODI_ROOT/addons/*/bin/* 2>/dev/null
 
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/addon_data/skin.estuary/settings.xml ]; then
+    cp -f /usr/share/kodi/config/guisettings.xml $HOME/.kodi/userdata
+  if [ -f /usr/share/kodi/config/skin.estuary.settings.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/addon_data/skin.estuary
+    cp /usr/share/kodi/config/skin.estuary.settings.xml $HOME/.kodi/userdata/addon_data/skin.estuary/settings.xml
+  fi
+fi
+
+# setup Kodi sources
+if [ ! -f $HOME/.kodi/userdata/peripheral_data/cec_CEC_Adapter.xml ]; then
+  if [ -f /usr/share/kodi/config/cec_CEC_Adapter.xml ]; then
+    mkdir -p $HOME/.kodi/userdata/peripheral_data
+    cp /usr/share/kodi/config/cec_CEC_Adapter.xml $HOME/.kodi/userdata/peripheral_data/cec_CEC_Adapter.xml
+  fi
+fi
 # setup Kodi sources
 if [ ! -f $KODI_ROOT/userdata/sources.xml ]; then
   if [ -f /usr/share/kodi/config/sources.xml ]; then
@@ -34,7 +99,7 @@ KODI_ARGS=""
 
 echo "KODI_ARGS=\"$KODI_ARGS\"" > /run/libreelec/kodi.conf
 
-if [ "$(uname -m)" = "x86_64" ]; then
+if [ "$(uname -m)" = "x86_64" -o "$(uname -m)" = "aarch64" ]; then
   echo "MALLOC_MMAP_THRESHOLD_=524288" >> /run/libreelec/kodi.conf
 else #arm
   echo "MALLOC_MMAP_THRESHOLD_=8192" >> /run/libreelec/kodi.conf

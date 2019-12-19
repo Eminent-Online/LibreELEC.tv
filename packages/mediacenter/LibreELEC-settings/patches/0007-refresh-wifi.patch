@@ -1,0 +1,24 @@
+From 604cde3357dfc54fe37273b2cb6c608f712f2caf Mon Sep 17 00:00:00 2001
+From: alex <surkov.alex@gmail.com>
+Date: Sun, 26 Feb 2017 06:01:22 -0500
+Subject: [PATCH 7/9] refresh wifi
+
+---
+ src/resources/lib/modules/connman.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/resources/lib/modules/connman.py b/src/resources/lib/modules/connman.py
+index 09b9e46..fe71dd5 100644
+--- a/src/resources/lib/modules/connman.py
++++ b/src/resources/lib/modules/connman.py
+@@ -1091,6 +1091,7 @@ class connman:
+             self.oe.set_busy(0)
+             self.menu_connections(None)
+             self.oe.dbg_log('connman::refresh_network', 'exit_function', 0)
++            os.system("/usr/bin/connmanctl scan wifi")
+         except Exception, e:
+             self.oe.set_busy(0)
+             self.oe.dbg_log('connman::refresh_network', 'ERROR: (' + repr(e) + ')', 4)
+-- 
+1.9.1
+

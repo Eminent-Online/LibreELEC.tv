@@ -1,0 +1,25 @@
+From bcc04d6fba7ca162fc2f17060afe837b0bfcf41c Mon Sep 17 00:00:00 2001
+From: alex <surkov.alex@gmail.com>
+Date: Thu, 7 Mar 2019 23:50:47 +0300
+Subject: [PATCH 6/9] set hostname
+
+---
+ src/resources/lib/modules/system.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/resources/lib/modules/system.py b/src/resources/lib/modules/system.py
+index b3956ae..b11a8ff 100644
+--- a/src/resources/lib/modules/system.py
++++ b/src/resources/lib/modules/system.py
+@@ -351,7 +351,7 @@ class system:
+             if not value is None:
+                 self.struct['ident']['settings']['hostname']['value'] = value
+             else:
+-                self.struct['ident']['settings']['hostname']['value'] = self.oe.DISTRIBUTION
++                self.struct['ident']['settings']['hostname']['value'] = self.oe.DEVICE
+         except Exception, e:
+             self.oe.dbg_log('system::load_values', 'ERROR: (' + repr(e) + ')')
+ 
+-- 
+2.7.4
+
