@@ -1,0 +1,100 @@
+From cf5ad23bf0c35c78e81f1ae65e47514cbd7e1aec Mon Sep 17 00:00:00 2001
+From: adamg <adamg88@users.noreply.github.com>
+Date: Tue, 26 Nov 2019 15:38:33 +0000
+Subject: [PATCH 43/43] Settings: remove GPU overclock setting as it has been
+ shown to introduce playback issues when seeking in H265 content.
+
+---
+ addons/resource.language.en_gb/resources/strings.po | 12 +-----------
+ system/settings/settings.xml                        |  8 --------
+ xbmc/settings/Settings.cpp                          |  1 -
+ xbmc/settings/Settings.h                            |  1 -
+ xbmc/windowing/amlogic/WinSystemAmlogic.cpp         |  6 ------
+ 5 files changed, 1 insertion(+), 27 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 4ee2928..e30ac47 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -8400,17 +8400,7 @@ msgctxt "#14291"
+ msgid "Disable HDMI audio output. Requires a reboot."
+ msgstr ""
+ 
+-#: system/settings/settings.xml
+-msgctxt "#14292"
+-msgid "Enable GPU overclock"
+-msgstr ""
+-
+-#: system/settings/settings.xml
+-msgctxt "#14293"
+-msgid "Enable this to overclock the GPU. WARNING! This will increase chipset temperatures. Requires a reboot."
+-msgstr ""
+-
+-#empty strings from id 14294 to 14300
++#empty strings from id 14292 to 14300
+ 
+ #. pvr "channels" settings group label
+ #: system/settings/settings.xml
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 75e3273..b05b7ac 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -3038,14 +3038,6 @@
+           <control type="toggle" />
+         </setting>
+       </group>
+-      <group id="4" label="10039">
+-        <setting id="coreelec.amlogic.maxgpuclock" type="boolean" label="14292" help="14293">
+-          <requirement>HAVE_AMCODEC</requirement>
+-          <level>3</level>
+-          <default>false</default>
+-          <control type="toggle" />
+-        </setting>
+-      </group>
+     </category>
+     <category id="cache" label="439" help="36399">
+       <visible>false</visible>
+diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
+index 58f17c2..97d250a 100644
+--- a/xbmc/settings/Settings.cpp
++++ b/xbmc/settings/Settings.cpp
+@@ -399,7 +399,6 @@ const std::string CSettings::SETTING_COREELEC_AMLOGIC_LIMIT8BIT = "coreelec.amlo
+ const std::string CSettings::SETTING_COREELEC_AMLOGIC_FORCE422 = "coreelec.amlogic.force422";
+ const std::string CSettings::SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND = "coreelec.amlogic.hevcworkaround";
+ const std::string CSettings::SETTING_COREELEC_AMLOGIC_MUTEHDMIAUDIO = "coreelec.amlogic.mutehdmiaudio";
+-const std::string CSettings::SETTING_COREELEC_AMLOGIC_MAXGPUCLOCK = "coreelec.amlogic.maxgpuclock";
+ const std::string CSettings::SETTING_CACHE_HARDDISK = "cache.harddisk";
+ const std::string CSettings::SETTING_CACHEVIDEO_DVDROM = "cachevideo.dvdrom";
+ const std::string CSettings::SETTING_CACHEVIDEO_LAN = "cachevideo.lan";
+diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
+index 6b99e6e..7fb539e 100644
+--- a/xbmc/settings/Settings.h
++++ b/xbmc/settings/Settings.h
+@@ -359,7 +359,6 @@ public:
+   static const std::string SETTING_COREELEC_AMLOGIC_FORCE422;
+   static const std::string SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND;
+   static const std::string SETTING_COREELEC_AMLOGIC_MUTEHDMIAUDIO;
+-  static const std::string SETTING_COREELEC_AMLOGIC_MAXGPUCLOCK;
+   static const std::string SETTING_CACHE_HARDDISK;
+   static const std::string SETTING_CACHEVIDEO_DVDROM;
+   static const std::string SETTING_CACHEVIDEO_LAN;
+diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+index e893774..f48997c 100644
+--- a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
++++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
+@@ -126,12 +126,6 @@ bool CWinSystemAmlogic::InitWindowSystem()
+      SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
+   }
+ 
+-  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_MAXGPUCLOCK))
+-  {
+-     CLog::Log(LOGDEBUG, "CWinSystemAmlogic::InitWindowSystem -- increasing GPU clock rate");
+-     SysfsUtils::SetString("/sys/class/mpgpu/scale_mode", "2");
+-  }
+-
+   m_nativeDisplay = EGL_DEFAULT_DISPLAY;
+ 
+   CDVDVideoCodecAmlogic::Register();
+-- 
+2.7.4
+

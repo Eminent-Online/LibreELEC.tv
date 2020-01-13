@@ -1,0 +1,28 @@
+From 8f16f6294420f942f9c2bd03d4dd10954f65fcd9 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 7 Aug 2019 04:06:28 +0100
+Subject: [PATCH 19/43] VideoPlayer: fix video axis for 4K 3D
+
+Patch: kodi-le-050-fix-video-axis-for-4k-3D.patch
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 45e7479..d3ae199 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -2370,10 +2370,6 @@ void CAMLCodec::SetVideoRect(const CRect &SrcRect, const CRect &DestRect)
+   {
+     float xscale = display.Width() / gui.Width();
+     float yscale = display.Height() / gui.Height();
+-    if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+-      xscale /= 2.0;
+-    else if (m_guiStereoMode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+-      yscale /= 2.0;
+     dst_rect.x1 *= xscale;
+     dst_rect.x2 *= xscale;
+     dst_rect.y1 *= yscale;
+-- 
+2.7.4
+

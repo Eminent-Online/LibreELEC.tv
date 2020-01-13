@@ -1,0 +1,32 @@
+From 0c64eff505c128726000bf9aa3fcf24339792646 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 7 Aug 2019 04:30:54 +0100
+Subject: [PATCH 30/43] Silence race condition error
+
+If Kodi start before network is fully up it complains JSON RPC server failed to start
+---
+ xbmc/network/NetworkServices.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
+index cbbac07..cacc397 100644
+--- a/xbmc/network/NetworkServices.cpp
++++ b/xbmc/network/NetworkServices.cpp
+@@ -483,10 +483,10 @@ void CNetworkServices::Start()
+ #endif // HAS_WEB_SERVER
+   if (m_settings->GetBool(CSettings::SETTING_SERVICES_UPNP))
+     StartUPnP();
+-  if (m_settings->GetBool(CSettings::SETTING_SERVICES_ESENABLED) && !StartEventServer())
+-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(33102), g_localizeStrings.Get(33100));
+-  if (m_settings->GetBool(CSettings::SETTING_SERVICES_ESENABLED) && !StartJSONRPCServer())
+-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(33103), g_localizeStrings.Get(33100));
++  if (m_settings->GetBool(CSettings::SETTING_SERVICES_ESENABLED)) {
++    StartEventServer();
++    StartJSONRPCServer();
++  }
+ 
+   // note - airtunesserver has to start before airplay server (ios7 client detection bug)
+   StartAirTunesServer();
+-- 
+2.7.4
+

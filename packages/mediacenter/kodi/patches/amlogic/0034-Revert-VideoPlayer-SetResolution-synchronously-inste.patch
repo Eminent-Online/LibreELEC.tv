@@ -1,0 +1,27 @@
+From bc5f2d727f6cba732013030e4e11ca5ffb4feeaa Mon Sep 17 00:00:00 2001
+From: cdu13a <cdu13a@gmail.com>
+Date: Wed, 14 Nov 2018 15:41:47 -0500
+Subject: [PATCH 34/43] Revert "[VideoPlayer] SetResolution synchronously
+ instead  RM::TriggerResolution"
+
+This reverts commit 062ae33446d01027ed6369cdc54bce9f151c7dea.
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 066383d..016d9b4 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -3768,8 +3768,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+     {
+       double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+-      RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
+-      CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
+       if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
+       {
+         framerate = 50.0;
+-- 
+2.7.4
+

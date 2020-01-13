@@ -1,0 +1,26 @@
+From 9ff4fc52d8718abdff5db436cc3e55afcb099dfb Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 7 Aug 2019 04:05:20 +0100
+Subject: [PATCH 18/43] VideoPlayer: GetMessage timeout patch.
+
+Patch: kodi-le-047-VideoPlayerVideo-GetMessage-timeout.patch
+---
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index 5cb49e1..418e319 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -317,7 +317,7 @@ void CVideoPlayerVideo::Process()
+ 
+   while (!m_bStop)
+   {
+-    int iQueueTimeOut = (int)(m_stalled ? frametime : frametime * 10) / 1000;
++    int iQueueTimeOut = (int)(m_stalled ? frametime * 10 : frametime * 11) / 10000;
+     int iPriority = 0;
+ 
+     if (m_syncState == IDVDStreamPlayer::SYNC_WAITSYNC)
+-- 
+2.7.4
+

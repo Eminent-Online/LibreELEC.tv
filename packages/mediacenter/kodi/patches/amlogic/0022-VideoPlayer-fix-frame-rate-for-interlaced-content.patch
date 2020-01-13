@@ -1,0 +1,127 @@
+From 4bc9565c519a63045f86661fc14418188b7bc111 Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 7 Aug 2019 04:14:29 +0100
+Subject: [PATCH 22/43] VideoPlayer: fix frame rate for interlaced content
+
+Patch: kodi-le-059-frame-rate-fix-for-interlaced.patch
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp      | 13 ++++++++++++
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp | 33 ++++++++++++++++++++++++++---
+ xbmc/cores/VideoPlayer/VideoPlayerVideo.h   |  1 +
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index e2235c8..6b52ebb 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -63,6 +63,7 @@
+ #include "Util.h"
+ #include "LangInfo.h"
+ #include "URL.h"
++#include "utils/MathUtils.h"
+ 
+ 
+ #ifdef TARGET_RASPBERRY_PI
+@@ -3712,6 +3713,7 @@ bool CVideoPlayer::OpenAudioStream(CDVDStreamInfo& hint, bool reset)
+ 
+ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+ {
++  m_processInfo->SetVideoInterlaced((hint.codecOptions & CODEC_INTERLACED) == CODEC_INTERLACED);
+   if (m_pInputStream && m_pInputStream->IsStreamType(DVDSTREAM_TYPE_DVD))
+   {
+     /* set aspect ratio as requested by navigator for dvd's */
+@@ -3768,6 +3770,17 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+       double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+       RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, !hint.stereo_mode.empty());
+       CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
++      if (MathUtils::FloatEquals(25.0f, static_cast<float>(framerate), 0.01f))
++      {
++        framerate = 50.0;
++        m_processInfo->SetVideoInterlaced(true);
++      }
++      if (MathUtils::FloatEquals(29.97f, static_cast<float>(framerate), 0.01f))
++      {
++        framerate = 60000.0 / 1001.0;
++        m_processInfo->SetVideoInterlaced(true);
++      }
++      m_processInfo->SetVideoFps(static_cast<float>(framerate));
+       m_renderManager.TriggerUpdateResolution(framerate, hint.width, hint.height, hint.stereo_mode);
+     }
+   }
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index 418e319..0c744d6 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -163,11 +163,24 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+   {
+     m_fFrameRate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+     m_bFpsInvalid = false;
++
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 25.0f, 0.01f))
++    {
++      m_fFrameRate = 50.0;
++      m_processInfo.SetVideoInterlaced(true);
++    }
++    if (MathUtils::FloatEquals(static_cast<float>(m_fFrameRate), 29.97f, 0.01f))
++    {
++      m_fFrameRate = 60000.0 / 1001.0;
++      m_processInfo.SetVideoInterlaced(true);
++    }
++    m_retryProgressive = 0;
+     m_processInfo.SetVideoFps(static_cast<float>(m_fFrameRate));
+   }
+   else
+   {
+-    m_fFrameRate = 25;
++    m_fFrameRate = 50;
++    m_processInfo.SetVideoInterlaced(true);
+     m_bFpsInvalid = true;
+     m_processInfo.SetVideoFps(0);
+   }
+@@ -180,8 +193,9 @@ void CVideoPlayerVideo::OpenStream(CDVDStreamInfo &hint, CDVDVideoCodec* codec)
+ 
+   if( m_fFrameRate > 120 || m_fFrameRate < 5 )
+   {
+-    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 25fps and just trust timestamps", (int)m_fFrameRate);
+-    m_fFrameRate = 25;
++    CLog::Log(LOGERROR, "CVideoPlayerVideo::OpenStream - Invalid framerate %d, using forced 50fps and just trust timestamps", (int)m_fFrameRate);
++    m_fFrameRate = 50;
++    m_processInfo.SetVideoInterlaced(true);
+   }
+ 
+   // use aspect in stream if available
+@@ -662,6 +676,19 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+   {
+     bool hasTimestamp = true;
+ 
++    if (m_processInfo.GetVideoInterlaced() && 
++        MathUtils::FloatEquals(static_cast<float>(m_picture.iDuration), static_cast<float>(2 * DVD_TIME_BASE) / m_processInfo.GetVideoFps(), 700.0f))
++    {
++      if (++m_retryProgressive > 3)
++      {
++        m_processInfo.SetVideoFps(m_processInfo.GetVideoFps() / 2.0f);
++        m_processInfo.SetVideoInterlaced(false);
++        m_renderManager.TriggerUpdateResolution(m_processInfo.GetVideoFps() / 2.0f, m_hints.width, m_hints.height, m_hints.stereo_mode);
++      }
++    }
++    else
++      m_retryProgressive = 0;
++
+     m_picture.iDuration = frametime;
+ 
+     // validate picture timing,
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+index b4b5cde..76d1bc5 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
+@@ -106,6 +106,7 @@ protected:
+ 
+   double m_iSubtitleDelay;
+ 
++  int m_retryProgressive;
+   int m_iLateFrames;
+   int m_iDroppedFrames;
+   int m_iDroppedRequest;
+-- 
+2.7.4
+

@@ -1,0 +1,35 @@
+From 4c1ba2d6308236699d72c0ea8547a214460a42bc Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Mon, 20 Feb 2017 00:34:53 +0100
+Subject: [PATCH 03/43] aml: work around forced deinterlacing of progressive
+ videos
+
+Current deinterlacer implementation treats all progressive videos as
+interlaced and makes them look awful. We need to bypass deinterlacer
+for progressive videos.
+
+On the other hand, bypassing it for VC-1 makes playback 2x slower,
+do bypass it only for other formats.
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 10e73cc..9120714 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1640,6 +1640,11 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+   am_private->gcodec.ratio64     = am_private->video_ratio64;
+   am_private->gcodec.param       = NULL;
+ 
++  if (am_private->video_format == VFORMAT_VC1)
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 0);
++  else
++    SysfsUtils::SetInt("/sys/module/di/parameters/bypass_prog", 1);
++
+   switch(am_private->video_format)
+   {
+     default:
+-- 
+2.7.4
+

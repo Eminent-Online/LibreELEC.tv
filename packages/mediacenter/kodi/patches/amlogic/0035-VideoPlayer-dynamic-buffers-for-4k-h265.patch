@@ -1,0 +1,30 @@
+From 28c7e226dc9c0de35c7e472c43333b9a0943418a Mon Sep 17 00:00:00 2001
+From: afl1 <afl2001@gmail.com>
+Date: Wed, 7 Aug 2019 04:37:53 +0100
+Subject: [PATCH 35/43] VideoPlayer: dynamic buffers for 4k h265
+
+Patch: kodi-ce-115-h265-dynbuffers-for-4k.patch
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index a8d4c39..a3a47bf 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1713,6 +1713,12 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints)
+       am_private->gcodec.param  = (void*)EXTERNAL_PTS;
+       if (m_hints.ptsinvalid)
+         am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
++
++      if ((hints.width > 1920) || !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_COREELEC_AMLOGIC_HEVCWORKAROUND))
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "8");
++      else
++        SysfsUtils::SetString("/sys/module/amvdec_h265/parameters/dynamic_buf_num_margin", "16");
++
+       break;
+     case VFORMAT_VP9:
+       am_private->gcodec.format = VIDEO_DEC_FORMAT_VP9;
+-- 
+2.7.4
+

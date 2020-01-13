@@ -1,0 +1,31 @@
+From 7e13190601689b323e27e834551beb42cb3444bb Mon Sep 17 00:00:00 2001
+From: Portisch <hugo.portisch@yahoo.de>
+Date: Tue, 12 Nov 2019 16:26:08 +0100
+Subject: [PATCH 42/43] AMLCodec: do not check free decoder buffer   The buffer
+ blocks (3 pcs, 512KB for 1080p, 2MB for >= 4k) are choosen   by frame size
+ and need a frame to get the next free block.
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index a3a47bf..f0fb965 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1932,11 +1932,7 @@ bool CAMLCodec::AddData(uint8_t *pData, size_t iSize, double dts, double pts)
+     return false;
+ 
+   struct buf_status bs;
+-  m_dll->codec_get_vbuf_state(&am_private->vcodec, &bs);
+-  if (iSize > (size_t)bs.free_len) {
+-    CLog::Log(LOGERROR, "CAMLCodec::AddData: packet to big: %d, probably corrupted", iSize);  
+-    return false;
+-  }
++
+   m_frameSizes.push_back(iSize);
+   m_frameSizeSum += iSize;
+ 
+-- 
+2.7.4
+
